@@ -1,0 +1,54 @@
+{
+  "name": "doc-merge",
+  "version": "0.0.1",
+  "description": "Fusion des documents",
+  "license": "MIT",
+  "repository": "",
+  "author": "Catalin Vascu",
+  "keywords": [
+    ""
+  ],
+  "files": [
+    "exe"
+  ],
+  "main": "./exe/lib/index.js",
+  "typings": "./exe/lib/index.d.ts",
+  "scripts": {
+    "test": "gulp test",
+    "performance": "node --allow-natives-syntax --prof ./node_modules/mocha/bin/_mocha ./exe/**/*.spec.js"
+  },
+  "nyc": {
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ],
+    "include": [
+      "exe/lib/**/*.js"
+    ]
+  },
+  "dependencies": {
+    "lodash": "^4.17.5"
+  },
+  "devDependencies": {
+    "@types/chai": "3.4.30",
+    "@types/lodash": "^4.14.107",
+    "@types/mocha": "^2.2.44",
+    "@types/node": "^8.0.53",
+    "chai": "3.5.0",
+    "del": "^2.2.1",
+    "dotbin": "^1.0",
+    "gulp": "^3.9.0",
+    "gulp-help": "^1.6.0",
+    "gulp-mocha": "^3.0.0",
+    "gulp-tslint": "^8.1.2",
+    "http": "0.0.0",
+    "merge2": "^1.2.0",
+    "mocha": "^4.0.1",
+    "ts-node": "^1.2.2",
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.1"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  }
+}

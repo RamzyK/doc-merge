@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Test debug",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+            "stopOnEntry": false,
+            "args": ["--reporter", "spec", "--timeout", "0", "--debug", "--require", "source-map-support/register", "./exe/test/**/*.js"],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": null,
+            "runtimeExecutable": null,
+            "runtimeArgs": [
+                "--nolazy",
+            ],
+            "env": {
+                "NODE_ICU_DATA": "./node_modules/full-icu",
+                "NODE_ENV": "development",
+                "DEBUG_TEST": "true"
+            },
+            "console": "internalConsole",
+            "sourceMaps": true,
+            "outFiles": ["${workspaceRoot}/exe/**/*.js"],
+            "skipFiles": [
+                "<node_internals>/**/*.js"
+              ]
+        }
+    ]
+}
