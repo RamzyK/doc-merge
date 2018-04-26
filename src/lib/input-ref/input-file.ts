@@ -1,81 +1,123 @@
 // tslint:disable:no-console
-import * as ip from 'C:\\projets\\doc-merge\\src\\lib\\index';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as util from 'util';
-import { request } from 'http';
+import { URL } from 'url';
+import * as request from 'request';
+// import * as tmp from 'tmp';
+import * as uuid from 'uuid';
+
+const write = util.promisify(fs.writeFile);
+const close = util.promisify(fs.close);
+const read = util.promisify(fs.readFile);
+const exist = util.promisify(fs.exists);
+const appendFile = util.promisify(fs.appendFile);
+const asyncExists = util.promisify(fs.exists);
+
 export type InputFileRef = string | IInputFile;
 export interface IInputFile {
     url: string;
-    headers: any;
-    verb: string;
+    headers?: any;
+    verb?: string;
 }
 
 export interface IInputFileOptions {
     tmpFolder: string;
 }
+
+async function httpRequest(options: request.Options): Promise<[request.Response, any]> {
+    return new Promise<[request.Response, any]>((resolve, reject) => {
+        request(options, (error, response, body) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve([response, body]);
+            }
+        });
+    });
+}
 export class InputFile {
+
+    private readonly protocolHandlers: Map<string, (data: IInputFile) => Promise<string>>;
     constructor(private readonly options: IInputFileOptions) {
+        this.protocolHandlers = new Map<string, (data: IInputFile) => Promise<string>>();
+
+        const httpHandler = this.getFileFromUrl.bind(this);
+
+        const fileHndler = async (data: IInputFile) => await this.getFileFromFileUrl(data);
+
+        this.protocolHandlers.set('http:', httpHandler);
+        this.protocolHandlers.set('https:', httpHandler);
+        this.protocolHandlers.set('file:', fileHndler);
     }
 
     public async getFile(data: InputFileRef): Promise<string> {
-        let path = this.options.tmpFolder;
-
-        let write = util.promisify(fs.writeFile);
-        let read = util.promisify(fs.readFile);
-        let exist = util.promisify(fs.exists);
-        let create = fs.appendFile;
-        const asyncExists = util.promisify(fs.exists);
-
-        let returnFile: string = '';
-
         if (typeof data === 'string') {
-            if (await !exist(path)) {
-                console.log('Path to the file does not exist!');
-            } else {
-                if (await !exist(path + '\\file.txt')) {
-                    console.log('No such file in directory!');
-
-                } else {
-                    let base64 = exports;
-                    let uncoded = new Buffer(data.toString() || '', 'base64').toString('utf8');
-
-                    fs.appendFile(path + '\\file.txt', uncoded, (err) => {
-                        if (err) {
-                            throw err;
-                        }
-                    });
-                    path = path + '\\file.txt';
-                }
-            }
+            return this.getFileFromString(data);
         } else {
-            let bodyParser = require('body-parser');
-            let express = require('express');
-            let router = express.Router();
-            let app = express();
-
-            app.use(bodyParser.json());
-
-            const { URL } = require('url');
-            const http = require('http');
-            const https = require('https');
-
-            const myURL = new URL(data.url);
-
-            if (myURL.protocole() === 'http') {
-                console.log('http protocole');
-                if (data.verb === 'GET') {
-                    request(data, (error: any, response: any, body: string) => {
-                    });
-                }
-
-            } else if (myURL.protocole() === 'https') {
-                console.log('https protocole');
-            } else {
-                console.log('Other protocole');
+            const barUrl = new URL(data.url);
+            const handler = this.protocolHandlers.get(barUrl.protocol);
+            if (!handler) {
+                throw new Error(`Error: protocol unknown: ${data.url}`);
             }
-
+            return await handler(data);
         }
-
-        return path;
     }
+    private async getFileFromUrl(data: IInputFile): Promise<string> {
+        const barUrl = new URL(data.url);
+        data.verb = data.verb || 'GET';
+
+        const options: request.Options = {
+            headers: data.headers,
+            uri: barUrl,
+            method: data.verb,
+        };
+        if (data.verb !== 'GET') {
+            // todo set request.body
+        }
+        // const response = await r.get(options). promise();
+        const [response, body] = await httpRequest(options);
+        const tmpPath = await this.saveFile(body, 'tmp', 'tmp');
+        return tmpPath;
+    }
+
+    private async getFileFromFileUrl(data: IInputFile): Promise<string> {
+        const barUrl = new URL(data.url);
+        const content = await read(barUrl);
+        return await this.saveFile(content, 'tmp', 'tmp');
+    }
+
+    private async getFileFromString(data: string): Promise<string> {
+        const content = new Buffer(data, 'base64');
+        return await this.saveFile(content, 'tmp', '');
+    }
+
+    private async saveFile(content: any, prefix: string, postfix: string): Promise<string> {
+        const tempPath = this.options.tmpFolder;
+        if (await !exist(tempPath)) {
+            throw new Error(`Temporary folder ${tempPath} does not exist!`);
+        }
+        prefix = prefix || '';
+        postfix = postfix || '.tmp';
+        const fileName = path.join(tempPath, prefix + uuid.v1() + postfix);
+        await appendFile(fileName, content);
+        return fileName;
+    }
+    // const x = new Promise<[string, number]>((resolve, reject) => {
+    //     tmp.file({
+    //         mode: 0x644,
+    //         prefix,
+    //         postfix,
+    //     }, (err, p, f) => {
+    //         if (err) {
+    //             reject(err);
+    //             return;
+    //         }
+    //         return [p, f];
+    //     });
+    // });
+    // const [path, fd] = await x;
+    // await write(fd, content);
+    // await close(fd);
+    // return path;
 }

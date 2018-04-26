@@ -1,10 +1,13 @@
 // tslint:disable:only-arrow-functions
+// tslint:disable:no-console
 import * as dm from '../lib/index';
 import 'mocha';
 import * as chai from 'chai';
 import * as path from 'path';
 import * as fs from 'fs';
 import { promisify } from 'util';
+import * as http from 'http';
+import { createStaticServer } from './static-server';
 
 const expect = chai.expect;
 
@@ -42,8 +45,59 @@ describe('InputFile', function () {
         const contentsInBase64 = fileBuffer.toString('base64');
 
         const file = await inputFile.getFile(contentsInBase64);
+        console.log('');
         const outputInBase64 = (await readFile(file)).toString('base64');
 
         expect(contentsInBase64).equals(outputInBase64);
+    });
+});
+
+async function getText(fileName: string): Promise<string> {
+    const fileBuffer = await readFile(fileName);
+    const fileContent = fileBuffer.toString();
+    return fileContent;
+}
+
+describe('InputFile avec url', function () {
+    let tmpFolder = path.join(__dirname + '\\file2');
+    beforeEach(async function () {
+        if (await asyncExists(tmpFolder)) {
+            await deleteDirectoryContent(tmpFolder);
+        } else {
+            await asyncMkDir(tmpFolder);
+        }
+    });
+    it('should save file from a file URL', async function () {
+        const fileName = path.join(__dirname, '../../test-files/simple-file.txt');
+        const option: dm.InputFileRef = {
+            url: 'file://' + fileName,
+        };
+        const inputFile = new dm.InputFile({
+            tmpFolder,
+        });
+        const contentsfile = await getText(fileName);
+
+        const file = await inputFile.getFile(option);
+        const outputFile = await getText(file);
+
+        expect(contentsfile).equals(outputFile);
+    });
+    it('should save file from a http URL', async function () {
+
+        const fileName = path.join(__dirname, '../../test-files/doc_output.docx');
+        const inputFile = new dm.InputFile({
+            tmpFolder,
+        });
+        const server = await createStaticServer();
+        const url = `http://localhost:${server.address().port}/doc_output.docx`;
+        const option: dm.InputFileRef = {
+            url,
+        };
+        const contentsfile = await getText(fileName);
+
+        const file = await inputFile.getFile(option);
+        const outputFile = await getText(file);
+
+        expect(contentsfile).equals(outputFile);
     });
 });
