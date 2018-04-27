@@ -20,7 +20,6 @@ export interface IInputFile {
     headers?: any;
     verb?: string;
 }
-
 export interface IInputFileOptions {
     tmpFolder: string;
 }
@@ -37,13 +36,12 @@ async function httpRequest(options: request.Options): Promise<[request.Response,
     });
 }
 export class InputFile {
-
+    private numFile = 0;
     private readonly protocolHandlers: Map<string, (data: IInputFile) => Promise<string>>;
     constructor(private readonly options: IInputFileOptions) {
         this.protocolHandlers = new Map<string, (data: IInputFile) => Promise<string>>();
 
         const httpHandler = this.getFileFromUrl.bind(this);
-
         const fileHndler = async (data: IInputFile) => await this.getFileFromFileUrl(data);
 
         this.protocolHandlers.set('http:', httpHandler);
@@ -65,6 +63,9 @@ export class InputFile {
     }
     private async getFileFromUrl(data: IInputFile): Promise<string> {
         const barUrl = new URL(data.url);
+        const strURL = barUrl.toString();
+        const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
+
         data.verb = data.verb || 'GET';
 
         const options: request.Options = {
@@ -75,21 +76,24 @@ export class InputFile {
         if (data.verb !== 'GET') {
             // todo set request.body
         }
-        // const response = await r.get(options). promise();
         const [response, body] = await httpRequest(options);
-        const tmpPath = await this.saveFile(body, 'tmp', 'tmp');
+        const tmpPath = await this.saveFile(body, 'temporary__' + nameFile.split('.')[0], '.' + nameFile.split('.')[1]);
         return tmpPath;
     }
 
     private async getFileFromFileUrl(data: IInputFile): Promise<string> {
         const barUrl = new URL(data.url);
+        const strURL = barUrl.toString();
+        const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
+
         const content = await read(barUrl);
-        return await this.saveFile(content, 'tmp', 'tmp');
+        return await this.saveFile(content, 'temporary__' + nameFile.split('.')[0], '.' + nameFile.split('.')[1]);
     }
 
     private async getFileFromString(data: string): Promise<string> {
         const content = new Buffer(data, 'base64');
-        return await this.saveFile(content, 'tmp', '');
+        this.numFile++;
+        return await this.saveFile(content, 'file' + this.numFile, '.txt');
     }
 
     private async saveFile(content: any, prefix: string, postfix: string): Promise<string> {
@@ -99,7 +103,7 @@ export class InputFile {
         }
         prefix = prefix || '';
         postfix = postfix || '.tmp';
-        const fileName = path.join(tempPath, prefix + uuid.v1() + postfix);
+        const fileName = path.join(tempPath, prefix + postfix);
         await appendFile(fileName, content);
         return fileName;
     }

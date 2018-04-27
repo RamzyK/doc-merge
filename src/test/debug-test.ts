@@ -4,7 +4,7 @@ import 'mocha';
 // to test only test 'y' in suite 'x':
 // const testToDebug = 'x y';
 // ex:
-const testToDebug: string = 'should save base 64 encoded file';
+const testToDebug: string = 'http';
 
 beforeEach(function () {
     // tslint:disable-next-line:no-this-assignment

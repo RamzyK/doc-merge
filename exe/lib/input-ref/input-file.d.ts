@@ -9,6 +9,7 @@ export interface IInputFileOptions {
 }
 export declare class InputFile {
     private readonly options;
+    private numFile;
     private readonly protocolHandlers;
     constructor(options: IInputFileOptions);
     getFile(data: InputFileRef): Promise<string>;

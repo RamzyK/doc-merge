@@ -5,7 +5,6 @@ const path = require("path");
 const util = require("util");
 const url_1 = require("url");
 const request = require("request");
-const uuid = require("uuid");
 const write = util.promisify(fs.writeFile);
 const close = util.promisify(fs.close);
 const read = util.promisify(fs.readFile);
@@ -27,6 +26,7 @@ async function httpRequest(options) {
 class InputFile {
     constructor(options) {
         this.options = options;
+        this.numFile = 0;
         this.protocolHandlers = new Map();
         const httpHandler = this.getFileFromUrl.bind(this);
         const fileHndler = async (data) => await this.getFileFromFileUrl(data);
@@ -49,6 +49,8 @@ class InputFile {
     }
     async getFileFromUrl(data) {
         const barUrl = new url_1.URL(data.url);
+        const strURL = barUrl.toString();
+        const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
         data.verb = data.verb || 'GET';
         const options = {
             headers: data.headers,
@@ -58,17 +60,20 @@ class InputFile {
         if (data.verb !== 'GET') {
         }
         const [response, body] = await httpRequest(options);
-        const tmpPath = await this.saveFile(body, 'tmp', 'tmp');
+        const tmpPath = await this.saveFile(body, 'temporary__' + nameFile.split('.')[0], '.' + nameFile.split('.')[1]);
         return tmpPath;
     }
     async getFileFromFileUrl(data) {
         const barUrl = new url_1.URL(data.url);
+        const strURL = barUrl.toString();
+        const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
         const content = await read(barUrl);
-        return await this.saveFile(content, 'tmp', 'tmp');
+        return await this.saveFile(content, 'temporary__' + nameFile.split('.')[0], '.' + nameFile.split('.')[1]);
     }
     async getFileFromString(data) {
         const content = new Buffer(data, 'base64');
-        return await this.saveFile(content, 'tmp', '');
+        this.numFile++;
+        return await this.saveFile(content, 'file' + this.numFile, '.txt');
     }
     async saveFile(content, prefix, postfix) {
         const tempPath = this.options.tmpFolder;
@@ -77,7 +82,7 @@ class InputFile {
         }
         prefix = prefix || '';
         postfix = postfix || '.tmp';
-        const fileName = path.join(tempPath, prefix + uuid.v1() + postfix);
+        const fileName = path.join(tempPath, prefix + postfix);
         await appendFile(fileName, content);
         return fileName;
     }
