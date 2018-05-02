@@ -84,27 +84,27 @@ describe('InputFile avec url', function () {
         expect(contentsfile).equals(outputFile);
     });
 
-    // it('should save file from a http URL', async function () {
-    //     const fileName = path.join(__dirname, '../../test-files/doc_output.docx');
-    //     const inputFile = new dm.InputFile({
-    //         tmpFolder,
-    //     });
-    //     const server = await createStaticServer();
-    //     try {
-    //         const url = `http://localhost:${server.address().port}/doc_output.docx`;
-    //         const option: dm.InputFileRef = {
-    //             url,
-    //         };
-    //         console.log(url);
-    //         const contentsfile = await getText(fileName);
+    it('should save file from a http URL', async function () {
+        const fileName = path.join(__dirname, '../../test-files/doc_output.docx');
+        const inputFile = new dm.InputFile({
+            tmpFolder,
+        });
+        const server = await createStaticServer();
+        try {
+            const url = `http://localhost:${server.address().port}/doc_output.docx`;
+            const option: dm.InputFileRef = {
+                url,
+            };
+            console.log(url);
+            const contentsfile = await getText(fileName);
 
-    //         const file = await inputFile.getFile(option);
-    //         const outputFile = await getText(file);
+            const file = await inputFile.getFile(option);
+            const outputFile = await getText(file);
 
-    //         expect(contentsfile).equals(outputFile);
-    //     } finally {
-    //          server.close();
-    //     }
+            expect(contentsfile).equals(outputFile);
+        } finally {
+             server.close();
+        }
 
-    // });
+    });
 });
