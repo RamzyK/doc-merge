@@ -35,6 +35,7 @@ async function httpRequest(options: request.Options): Promise<[request.Response,
         });
     });
 }
+
 export class InputFile {
     private numFile = 0;
     private readonly protocolHandlers: Map<string, (data: IInputFile) => Promise<string>>;
@@ -89,7 +90,6 @@ export class InputFile {
         const content = await read(barUrl);
         return await this.saveFile(content, 'temporary__' + nameFile.split('.')[0], '.' + nameFile.split('.')[1]);
     }
-
     private async getFileFromString(data: string): Promise<string> {
         const content = new Buffer(data, 'base64');
         this.numFile++;

@@ -68,7 +68,7 @@ class InputFile {
         const strURL = barUrl.toString();
         const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
         const content = await read(barUrl);
-        return await this.saveFile(content, 'temporary__' + nameFile.split('.')[0], '.' + nameFile.split('.')[1]);
+        return await this.saveFile(content, 'temporary__' + nameFile.split('.')[0], '.' + 'pdf');
     }
     async getFileFromString(data) {
         const content = new Buffer(data, 'base64');
