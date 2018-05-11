@@ -1,8 +1,20 @@
-export declare type InputFileRef = string | IInputFile;
-export interface IInputFile {
+export declare type InputFileRef = string | IFile;
+export declare enum OutputType {
+    download = 0,
+    url = 1,
+    upload = 2,
+}
+export interface IOutputMode {
+    isDirectDownload: boolean;
+}
+export interface IFile {
     url: string;
     headers?: any;
     verb?: string;
+}
+export interface IInputFile extends IFile {
+}
+export interface IOutputFile extends IFile {
 }
 export interface IInputFileOptions {
     tmpFolder: string;

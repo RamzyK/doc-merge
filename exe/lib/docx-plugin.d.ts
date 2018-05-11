@@ -1,6 +1,11 @@
 import { IPlugin, IPluginResult } from './generator';
-import { IInputFile } from './input-ref/input-file';
+import { IFile } from './input-ref/input-file';
+import * as gn from './index';
 export declare class DocXPlugin implements IPlugin {
     name?: string;
-    merge(modele: string, data: string | IInputFile, fileName?: string): Promise<IPluginResult>;
+    cpt: number;
+    merge(data: string | IFile, input: gn.IBody, modelePath: string): Promise<IPluginResult>;
+    generateRndmName(compteur: number): string;
+    private docXmerge(data, input);
+    private docxGenerator(data, input, fileURL);
 }

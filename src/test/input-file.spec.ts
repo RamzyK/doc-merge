@@ -1,6 +1,7 @@
 // tslint:disable:only-arrow-functions
 // tslint:disable:no-console
 import * as dm from '../lib/index';
+import * as dl from '../lib/input-ref/input-file';
 import 'mocha';
 import * as chai from 'chai';
 import * as path from 'path';
@@ -28,29 +29,29 @@ async function deleteDirectoryContent(dirPath: string) {
     }
 }
 
-// describe('InputFile', function () {
-//     const tmpFolder = path.join(__dirname, 'files');
-//     beforeEach(async function () {
-//         if (await asyncExists(tmpFolder)) {
-//             await deleteDirectoryContent(tmpFolder);
-//         } else {
-//             await asyncMkDir(tmpFolder);
-//         }
-//     });
-//     it('should save base 64 encoded file', async function () {
-//         const inputFile = new dm.InputFile({
-//             tmpFolder,
-//         });
-//         const fileBuffer = await readFile(__filename);
-//         const contentsInBase64 = fileBuffer.toString('base64');
+describe('InputFile', function () {
+    const tmpFolder = path.join(__dirname, 'files');
+    beforeEach(async function () {
+        if (await asyncExists(tmpFolder)) {
+            await deleteDirectoryContent(tmpFolder);
+        } else {
+            await asyncMkDir(tmpFolder);
+        }
+    });
+    it('should save base 64 encoded file', async function () {
+        const inputFile = new dm.InputFile({
+            tmpFolder,
+        });
+        const fileBuffer = await readFile(__filename);
+        const contentsInBase64 = fileBuffer.toString('base64');
 
-//         const file = await inputFile.getFile(contentsInBase64);
-//         console.log('');
-//         const outputInBase64 = (await readFile(file)).toString('base64');
+        const file = await inputFile.getFile(contentsInBase64);
+        console.log('');
+        const outputInBase64 = (await readFile(file)).toString('base64');
 
-//         expect(contentsInBase64).equals(outputInBase64);
-//     });
-// });
+        expect(contentsInBase64).equals(outputInBase64);
+    });
+});
 
 async function getText(fileName: string): Promise<string> {
     const fileBuffer = await readFile(fileName);
@@ -111,12 +112,50 @@ describe('InputFile avec url', function () {
             const contentsfile = await getText(fileName);
 
             const file = await inputFile.getFile(option);
-           // const outputFile = await getText(file);
+            const outputFile = await getText(file);
 
-            expect(contentsfile).equals(contentsfile);
+            expect(contentsfile).equals(outputFile);
         } finally {
-             server.close();
+            server.close();
         }
 
+    });
+});
+
+describe('Generate a docx document', function () {
+    it('should generate a .docx file', async function () {
+        const server = await createStaticServer();
+        const fileData: dm.IFile = {
+            url: 'file://C:/Users/raker/Desktop/Document.docx',             // CHemin vers le document model
+            verb: 'GET',
+        };
+        const options = {
+            last_name: 'Kermad',
+            first_name: 'Ramzy',
+            phone: '06-06-06-06-06',
+            description: 'Stage dev Javascript/ Typescript',
+        };
+        const docxPath = 'C:/Users/raker/Desktop/docxGenerator';            // Chemin vers le dossier de depôt
+        const autoDownload: dm.IOutputMode = {
+            isDirectDownload: true,
+        };
+        const docOption: dm.IBody = {
+            type: 'docx',
+            data: options,
+            modeleRef: fileData,
+            outputFileName: 'newDoc.docx',
+            outputPath: docxPath,
+            downloadType: autoDownload,
+        };
+
+        const generator = new dm.Generator(docOption);
+        generator.registerPlugin('docx', new dm.DocXPlugin());
+        if (await asyncExists(docxPath)) {
+            await deleteDirectoryContent(docxPath);
+        } else {
+            await asyncMkDir(docxPath);
+        }
+        const generated = await generator.docMerge(docOption);
+        expect(generated.state).equals('done');
     });
 });

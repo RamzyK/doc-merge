@@ -11,6 +11,12 @@ const read = util.promisify(fs.readFile);
 const exist = util.promisify(fs.exists);
 const appendFile = util.promisify(fs.appendFile);
 const asyncExists = util.promisify(fs.exists);
+var OutputType;
+(function (OutputType) {
+    OutputType[OutputType["download"] = 0] = "download";
+    OutputType[OutputType["url"] = 1] = "url";
+    OutputType[OutputType["upload"] = 2] = "upload";
+})(OutputType = exports.OutputType || (exports.OutputType = {}));
 async function httpRequest(options) {
     return new Promise((resolve, reject) => {
         request(options, (error, response, body) => {
@@ -68,7 +74,7 @@ class InputFile {
         const strURL = barUrl.toString();
         const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
         const content = await read(barUrl);
-        return await this.saveFile(content, 'temporary__' + nameFile.split('.')[0], '.' + 'pdf');
+        return await this.saveFile(content, 'temporary__' + nameFile.split('.')[0], '.' + nameFile.split('.')[1]);
     }
     async getFileFromString(data) {
         const content = new Buffer(data, 'base64');

@@ -14,11 +14,29 @@ const exist = util.promisify(fs.exists);
 const appendFile = util.promisify(fs.appendFile);
 const asyncExists = util.promisify(fs.exists);
 
-export type InputFileRef = string | IInputFile;
-export interface IInputFile {
+export type InputFileRef = string | IFile;
+
+export enum OutputType {
+    download,
+    url,
+    upload,
+}
+export interface IOutputMode {
+    isDirectDownload: boolean;
+
+}
+export interface IFile {
     url: string;
     headers?: any;
     verb?: string;
+}
+// tslint:disable-next-line:no-empty-interface
+export interface IInputFile extends IFile {
+
+}
+// tslint:disable-next-line:no-empty-interface
+export interface IOutputFile extends IFile {
+
 }
 export interface IInputFileOptions {
     tmpFolder: string;
@@ -38,12 +56,13 @@ async function httpRequest(options: request.Options): Promise<[request.Response,
 
 export class InputFile {
     private numFile = 0;
-    private readonly protocolHandlers: Map<string, (data: IInputFile) => Promise<string>>;
+    private readonly protocolHandlers: Map<string, (data: IFile) => Promise<string>>;
+
     constructor(private readonly options: IInputFileOptions) {
-        this.protocolHandlers = new Map<string, (data: IInputFile) => Promise<string>>();
+        this.protocolHandlers = new Map<string, (data: IFile) => Promise<string>>();
 
         const httpHandler = this.getFileFromUrl.bind(this);
-        const fileHndler = async (data: IInputFile) => await this.getFileFromFileUrl(data);
+        const fileHndler = async (data: IFile) => await this.getFileFromFileUrl(data);
 
         this.protocolHandlers.set('http:', httpHandler);
         this.protocolHandlers.set('https:', httpHandler);
@@ -62,7 +81,7 @@ export class InputFile {
             return await handler(data);
         }
     }
-    private async getFileFromUrl(data: IInputFile): Promise<string> {
+    private async getFileFromUrl(data: IFile): Promise<string> {
         const barUrl = new URL(data.url);
         const strURL = barUrl.toString();
         const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
@@ -82,7 +101,7 @@ export class InputFile {
         return tmpPath;
     }
 
-    private async getFileFromFileUrl(data: IInputFile): Promise<string> {
+    private async getFileFromFileUrl(data: IFile): Promise<string> {
         const barUrl = new URL(data.url);
         const strURL = barUrl.toString();
         const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);

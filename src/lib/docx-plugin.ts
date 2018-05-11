@@ -1,21 +1,87 @@
 import { IPlugin, IPluginResult, Generator } from './generator';
-import { IInputFile, InputFile } from './input-ref/input-file';
+import { IFile, InputFile, } from './input-ref/input-file';
+import { DownloadHandler } from './downloadManager';
+import * as util from 'util';
+import * as gn from './index';
+import * as fs from 'fs';
+import * as url from 'url';
+// tslint:disable:no-var-requires
+
+const jsZip = require('jszip');
+const docxtemplater = require('docxtemplater');
+import * as path from 'path';
+
 // tslint:disable:no-console
+
 export class DocXPlugin implements IPlugin {
     public name?: string;
-    public async merge(modele: string, data: string | IInputFile, fileName?: string): Promise<IPluginResult> {
-        let extension = modele.substr(modele.lastIndexOf('/') + 1).split('.');
-        let tmpFolder = modele;
-        const ipFile = new InputFile({
-            tmpFolder,
-        });
-        if (extension[1] === 'docx') {
-            ipFile.getFile(data);
-        } else if (extension[1] === 'pdf') {
-            // do pdf generation doc work
-        } else {
-            console.log('Other type of document!');
-        }
-        return null;
+    public cpt = 0;
+    // tslint:disable-next-line:max-line-length
+    public async merge(data: string | IFile, input: gn.IBody, modelePath: string): Promise<IPluginResult> {
+        return await this.docXmerge(data, input);
     }
+    public generateRndmName(compteur: number): string {
+        this.cpt++;
+        return 'file_fusionned' + (compteur) + '.docx';
+    }
+
+    // tslint:disable-next-line:max-line-length
+    private async docXmerge(data: string | IFile, input: gn.IBody): Promise<IPluginResult> {
+        const iplugin: gn.IPluginResult = {
+            state: '',
+        };
+        let isDirectDownload = input.downloadType.isDirectDownload;
+        let download;
+
+        if (typeof (data) !== 'string') {
+            let iplugArray = (await this.docxGenerator(data, input, data.url)).split(' ');
+            iplugin.state = iplugArray[0];               // 'done' or error thrown
+
+            if (iplugin.state !== 'error') {
+                let pathTodocx = iplugArray[1];         // Path to the generated docx file
+                download = new DownloadHandler(pathTodocx);
+                await download.downloadFile(isDirectDownload, input);
+            }
+
+        } else {
+            let inputFile = new InputFile({
+                tmpFolder: '',            // Path to the base64 coded file
+            });
+            let pathToFile64 = await inputFile.getFile(data);
+            download = new DownloadHandler(pathToFile64);
+            download.downloadFile(isDirectDownload, input);
+        }
+
+        return iplugin;
+    }
+
+    private async docxGenerator(data: string | IFile, input: gn.IBody, fileURL: string): Promise<string> {
+        const read = util.promisify(fs.readFile);
+        const write = util.promisify(fs.writeFile);
+        let answer: string;
+
+        try {
+            const content = await read(new url.URL(fileURL), 'binary');
+            const zip = new jsZip(content);
+            let pathToDocx = input.outputPath + '/' + input.outputFileName;
+            const doc = new docxtemplater();
+
+            doc.loadZip(zip);
+            doc.setData(input.data);
+            doc.render();
+
+            const buf = doc.getZip().generate({ type: 'nodebuffer' });
+            if (input.outputFileName === '' || input.outputFileName === undefined) {
+                input.outputFileName = this.generateRndmName(1);
+
+                console.log(`File named: ${input.outputFileName}!`);
+            }
+            await write(pathToDocx, buf);
+
+            return 'done ' + pathToDocx;
+        } catch (error) {
+            throw new Error('Error while generating docx file!');
+        }
+    }
+
 }

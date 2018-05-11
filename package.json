@@ -27,9 +27,15 @@
     ]
   },
   "dependencies": {
+    "@types/pdfkit": "^0.7.36",
     "body-parser": "^1.18.2",
+    "docxtemplater": "^3.6.2",
+    "download-file": "^0.1.5",
+    "jszip": "^2.6.1",
     "lodash": "^4.17.5",
+    "pdfkit": "^0.8.3",
     "request": "^2.85.0",
+    "save": "^2.3.2",
     "tmp": "^0.0.33",
     "uuid": "^3.2.1"
   },
