@@ -6,5 +6,5 @@ export declare class DownloadHandler implements dl.IOutputFile, dl.IInputFile {
     readonly verb: string;
     constructor(url: string, headers?: any, verb?: string);
     downloadFile(input: IBody): Promise<string>;
-    uploadFile(): Promise<string>;
+    uploadFile(input: IBody): Promise<string>;
 }

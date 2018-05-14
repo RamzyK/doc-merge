@@ -25,7 +25,7 @@ class DownloadHandler {
         });
         return null;
     }
-    async uploadFile() {
+    async uploadFile(input) {
         app.post('/', (request, response) => {
             console.log(request.body);
             response.send(request.body);

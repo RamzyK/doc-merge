@@ -36,7 +36,7 @@ class DocXPlugin {
                 }
                 else if (input.downloadType.dType === gn.OutputType.upload) {
                     console.log('&');
-                    await download.uploadFile();
+                    await download.uploadFile(input);
                 }
             }
         }
