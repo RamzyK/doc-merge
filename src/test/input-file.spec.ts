@@ -29,116 +29,124 @@ async function deleteDirectoryContent(dirPath: string) {
     }
 }
 
-describe('InputFile', function () {
-    const tmpFolder = path.join(__dirname, 'files');
-    beforeEach(async function () {
-        if (await asyncExists(tmpFolder)) {
-            await deleteDirectoryContent(tmpFolder);
-        } else {
-            await asyncMkDir(tmpFolder);
-        }
-    });
-    it('should save base 64 encoded file', async function () {
-        const inputFile = new dm.InputFile({
-            tmpFolder,
-        });
-        const fileBuffer = await readFile(__filename);
-        const contentsInBase64 = fileBuffer.toString('base64');
+// describe('InputFile', function () {
+//     const tmpFolder = path.join(__dirname, 'files');
+//     beforeEach(async function () {
+//         if (await asyncExists(tmpFolder)) {
+//             await deleteDirectoryContent(tmpFolder);
+//         } else {
+//             await asyncMkDir(tmpFolder);
+//         }
+//     });
+//     it('should save base 64 encoded file', async function () {
+//         const inputFile = new dm.InputFile({
+//             tmpFolder,
+//         });
+//         const fileBuffer = await readFile(__filename);
+//         const contentsInBase64 = fileBuffer.toString('base64');
 
-        const file = await inputFile.getFile(contentsInBase64);
-        console.log('');
-        const outputInBase64 = (await readFile(file)).toString('base64');
+//         const file = await inputFile.getFile(contentsInBase64);
+//         console.log('');
+//         const outputInBase64 = (await readFile(file)).toString('base64');
 
-        expect(contentsInBase64).equals(outputInBase64);
-    });
-});
+//         expect(contentsInBase64).equals(outputInBase64);
+//     });
+// });
 
-async function getText(fileName: string): Promise<string> {
-    const fileBuffer = await readFile(fileName);
-    const fileContent = fileBuffer.toString();
-    return fileContent;
-}
+// async function getText(fileName: string): Promise<string> {
+//     const fileBuffer = await readFile(fileName);
+//     const fileContent = fileBuffer.toString();
+//     return fileContent;
+// }
 
-describe('InputFile avec url', function () {
-    let tmpFolder = path.join(__dirname + '\\tmpFile_1');
-    beforeEach(async function () {
-        if (await asyncExists(tmpFolder)) {
-            await deleteDirectoryContent(tmpFolder);
-        } else {
-            await asyncMkDir(tmpFolder);
-        }
-    });
+// describe('InputFile avec url', function () {
+//     let tmpFolder = path.join(__dirname + '\\tmpFile_1');
+//     beforeEach(async function () {
+//         if (await asyncExists(tmpFolder)) {
+//             await deleteDirectoryContent(tmpFolder);
+//         } else {
+//             await asyncMkDir(tmpFolder);
+//         }
+//     });
 
-    it('should save file from a file URL', async function () {
-        const fileName = path.join(__dirname, '../../test-files/doc_output.docx');
-        const option: dm.InputFileRef = {
-            url: 'file://' + fileName,
-        };
-        const inputFile = new dm.InputFile({
-            tmpFolder,
-        });
-        const contentsfile = await getText(fileName);
+//     it('should save file from a file URL', async function () {
+//         const fileName = path.join(__dirname, '../../test-files/doc_output.docx');
+//         const option: dm.InputFileRef = {
+//             url: 'file://' + fileName,
+//         };
+//         const inputFile = new dm.InputFile({
+//             tmpFolder,
+//         });
+//         const contentsfile = await getText(fileName);
 
-        const file = await inputFile.getFile(option);
-        const outputFile = await getText(file);
+//         const file = await inputFile.getFile(option);
+//         const outputFile = await getText(file);
 
-        expect(contentsfile).equals(outputFile);
-    });
+//         expect(contentsfile).equals(outputFile);
+//     });
 
-});
+// });
 
-describe('InputFile avec url', function () {
-    let tmpFolder = path.join(__dirname + '\\tmpFile_2');
-    beforeEach(async function () {
-        if (await asyncExists(tmpFolder)) {
-            await deleteDirectoryContent(tmpFolder);
-        } else {
-            await asyncMkDir(tmpFolder);
-        }
-    });
+// describe('InputFile avec url', function () {
+//     let tmpFolder = path.join(__dirname + '\\tmpFile_2');
+//     beforeEach(async function () {
+//         if (await asyncExists(tmpFolder)) {
+//             await deleteDirectoryContent(tmpFolder);
+//         } else {
+//             await asyncMkDir(tmpFolder);
+//         }
+//     });
 
-    it('should save file from a http URL', async function () {
-        const fileName = path.join(__dirname, '../../test-files/simple-file.txt');
-        const inputFile = new dm.InputFile({
-            tmpFolder,
-        });
-        const server = await createStaticServer();
-        try {
-            const url = `http://localhost:${server.address().port}/simple-file.txt`;
-            const option: dm.InputFileRef = {
-                url,
-            };
-            console.log(url);
-            const contentsfile = await getText(fileName);
+//     it('should save file from a http URL', async function () {
+//         const fileName = path.join(__dirname, '../../test-files/simple-file.txt');
+//         const inputFile = new dm.InputFile({
+//             tmpFolder,
+//         });
+//         const server = await createStaticServer();
+//         try {
+//             const url = `http://localhost:${server.address().port}/simple-file.txt`;
+//             const option: dm.InputFileRef = {
+//                 url,
+//             };
+//             console.log(url);
+//             const contentsfile = await getText(fileName);
 
-            const file = await inputFile.getFile(option);
-            const outputFile = await getText(file);
+//             const file = await inputFile.getFile(option);
+//             const outputFile = await getText(file);
 
-            expect(contentsfile).equals(outputFile);
-        } finally {
-            server.close();
-        }
+//             expect(contentsfile).equals(outputFile);
+//         } finally {
+//             server.close();
+//         }
 
-    });
-});
+//     });
+// });
 
 describe('Generate a docx document', function () {
     it('should generate a .docx file', async function () {
-        const server = await createStaticServer();
+        const docxPath = 'C:/Users/raker/Desktop/docxGenerator';            // Chemin vers le dossier de depôt
         const fileData: dm.IFile = {
-            url: 'file://C:/Users/raker/Desktop/Document.docx',             // CHemin vers le document model
+            url: 'file://C:/Users/raker/Desktop/Document.docx',             // Chemin vers le document model
+            headers: {
+                'Allow': 'POST',
+                'ContentLength': 0,
+                'Content-Type': 'text/html; charset=UTF-8',
+            },
             verb: 'GET',
         };
+
         const options = {
             last_name: 'Kermad',
             first_name: 'Ramzy',
             phone: '06-06-06-06-06',
             description: 'Stage dev Javascript/ Typescript',
         };
-        const docxPath = 'C:/Users/raker/Desktop/docxGenerator';            // Chemin vers le dossier de depôt
+
         const autoDownload: dm.IOutputMode = {
-            isDirectDownload: true,
+            isDirectDownload: false,
+            dType: dm.OutputType.upload,
         };
+
         const docOption: dm.IBody = {
             type: 'docx',
             data: options,
@@ -150,11 +158,13 @@ describe('Generate a docx document', function () {
 
         const generator = new dm.Generator(docOption);
         generator.registerPlugin('docx', new dm.DocXPlugin());
+
         if (await asyncExists(docxPath)) {
             await deleteDirectoryContent(docxPath);
         } else {
             await asyncMkDir(docxPath);
         }
+
         const generated = await generator.docMerge(docOption);
         expect(generated.state).equals('done');
     });

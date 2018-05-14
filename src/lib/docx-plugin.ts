@@ -17,7 +17,7 @@ export class DocXPlugin implements IPlugin {
     public name?: string;
     public cpt = 0;
     // tslint:disable-next-line:max-line-length
-    public async merge(data: string | IFile, input: gn.IBody, modelePath: string): Promise<IPluginResult> {
+    public async merge(data: string | IFile, input: gn.IBody): Promise<IPluginResult> {
         return await this.docXmerge(data, input);
     }
     public generateRndmName(compteur: number): string {
@@ -40,7 +40,12 @@ export class DocXPlugin implements IPlugin {
             if (iplugin.state !== 'error') {
                 let pathTodocx = iplugArray[1];         // Path to the generated docx file
                 download = new DownloadHandler(pathTodocx);
-                await download.downloadFile(isDirectDownload, input);
+                if (isDirectDownload === true) {
+                    await download.downloadFile(input);
+                } else if (input.downloadType.dType === gn.OutputType.upload) {
+                    console.log('&');
+                    await download.uploadFile(input);
+                }
             }
 
         } else {
@@ -49,7 +54,7 @@ export class DocXPlugin implements IPlugin {
             });
             let pathToFile64 = await inputFile.getFile(data);
             download = new DownloadHandler(pathToFile64);
-            download.downloadFile(isDirectDownload, input);
+            download.downloadFile(input);
         }
 
         return iplugin;

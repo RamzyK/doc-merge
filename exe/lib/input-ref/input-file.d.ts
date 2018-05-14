@@ -6,6 +6,7 @@ export declare enum OutputType {
 }
 export interface IOutputMode {
     isDirectDownload: boolean;
+    dType: OutputType;
 }
 export interface IFile {
     url: string;

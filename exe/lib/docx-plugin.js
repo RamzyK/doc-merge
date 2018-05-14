@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const input_file_1 = require("./input-ref/input-file");
 const downloadManager_1 = require("./downloadManager");
 const util = require("util");
+const gn = require("./index");
 const fs = require("fs");
 const url = require("url");
 const jsZip = require('jszip');
@@ -11,7 +12,7 @@ class DocXPlugin {
     constructor() {
         this.cpt = 0;
     }
-    async merge(data, input, modelePath) {
+    async merge(data, input) {
         return await this.docXmerge(data, input);
     }
     generateRndmName(compteur) {
@@ -30,7 +31,13 @@ class DocXPlugin {
             if (iplugin.state !== 'error') {
                 let pathTodocx = iplugArray[1];
                 download = new downloadManager_1.DownloadHandler(pathTodocx);
-                await download.downloadFile(isDirectDownload, input.type);
+                if (isDirectDownload === true) {
+                    await download.downloadFile(input);
+                }
+                else if (input.downloadType.dType === gn.OutputType.upload) {
+                    console.log('&');
+                    await download.uploadFile();
+                }
             }
         }
         else {
@@ -39,7 +46,7 @@ class DocXPlugin {
             });
             let pathToFile64 = await inputFile.getFile(data);
             download = new downloadManager_1.DownloadHandler(pathToFile64);
-            download.downloadFile(isDirectDownload, 'txt');
+            download.downloadFile(input);
         }
         return iplugin;
     }
