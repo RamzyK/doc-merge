@@ -7,7 +7,7 @@ const url_1 = require("url");
 const request = require("request");
 const write = util.promisify(fs.writeFile);
 const close = util.promisify(fs.close);
-const read = util.promisify(fs.readFile);
+const readFile = util.promisify(fs.readFile);
 const exist = util.promisify(fs.exists);
 const appendFile = util.promisify(fs.appendFile);
 const asyncExists = util.promisify(fs.exists);
@@ -73,7 +73,7 @@ class InputFile {
         const barUrl = new url_1.URL(data.url);
         const strURL = barUrl.toString();
         const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
-        const content = await read(barUrl);
+        const content = await readFile(barUrl);
         return await this.saveFile(content, 'temporary__' + nameFile.split('.')[0], '.' + nameFile.split('.')[1]);
     }
     async getFileFromString(data) {

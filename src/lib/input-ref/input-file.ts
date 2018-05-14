@@ -9,7 +9,7 @@ import * as uuid from 'uuid';
 
 const write = util.promisify(fs.writeFile);
 const close = util.promisify(fs.close);
-const read = util.promisify(fs.readFile);
+const readFile = util.promisify(fs.readFile);
 const exist = util.promisify(fs.exists);
 const appendFile = util.promisify(fs.appendFile);
 const asyncExists = util.promisify(fs.exists);
@@ -107,7 +107,7 @@ export class InputFile {
         const strURL = barUrl.toString();
         const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
 
-        const content = await read(barUrl);
+        const content = await readFile(barUrl);
         return await this.saveFile(content, 'temporary__' + nameFile.split('.')[0], '.' + nameFile.split('.')[1]);
     }
     private async getFileFromString(data: string): Promise<string> {

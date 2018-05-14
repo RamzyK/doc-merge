@@ -16,6 +16,7 @@ export interface IBody {
     culture?: string;
     modeleRef: InputFileRef;
     outputFileName: string;
+    // TODO: outputPath => config
     outputPath: string;
     downloadType: IOutputMode;
 }
