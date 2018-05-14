@@ -26,8 +26,8 @@ export declare class InputFile {
     private readonly protocolHandlers;
     constructor(options: IInputFileOptions);
     getFile(data: InputFileRef): Promise<string>;
-    private getFileFromUrl(data);
-    private getFileFromFileUrl(data);
-    private getFileFromString(data);
+    private getFileFromUrl(data, key);
+    private getFileFromFileUrl(data, key);
+    private getFileFromString(data, key);
     private saveFile(content, prefix, postfix);
 }

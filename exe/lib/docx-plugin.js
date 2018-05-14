@@ -15,9 +15,8 @@ class DocXPlugin {
     async merge(data, input) {
         return await this.docXmerge(data, input);
     }
-    generateRndmName(compteur) {
-        this.cpt++;
-        return 'file_fusionned' + (compteur) + '.docx';
+    generateRndmName() {
+        return 'file_fusionned' + '.docx';
     }
     async docXmerge(data, input) {
         const iplugin = {
@@ -64,7 +63,7 @@ class DocXPlugin {
             doc.render();
             const buf = doc.getZip().generate({ type: 'nodebuffer' });
             if (input.outputFileName === '' || input.outputFileName === undefined) {
-                input.outputFileName = this.generateRndmName(1);
+                input.outputFileName = this.generateRndmName();
                 console.log(`File named: ${input.outputFileName}!`);
             }
             await write(pathToDocx, buf);

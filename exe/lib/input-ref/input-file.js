@@ -5,6 +5,7 @@ const path = require("path");
 const util = require("util");
 const url_1 = require("url");
 const request = require("request");
+const uuid = require("uuid");
 const write = util.promisify(fs.writeFile);
 const close = util.promisify(fs.close);
 const readFile = util.promisify(fs.readFile);
@@ -35,14 +36,16 @@ class InputFile {
         this.numFile = 0;
         this.protocolHandlers = new Map();
         const httpHandler = this.getFileFromUrl.bind(this);
-        const fileHndler = async (data) => await this.getFileFromFileUrl(data);
+        const key = uuid.v4();
+        const fileHndler = async (data) => await this.getFileFromFileUrl(data, key);
         this.protocolHandlers.set('http:', httpHandler);
         this.protocolHandlers.set('https:', httpHandler);
         this.protocolHandlers.set('file:', fileHndler);
     }
     async getFile(data) {
         if (typeof data === 'string') {
-            return this.getFileFromString(data);
+            const key = uuid.v4();
+            return this.getFileFromString(data, key);
         }
         else {
             const barUrl = new url_1.URL(data.url);
@@ -53,7 +56,7 @@ class InputFile {
             return await handler(data);
         }
     }
-    async getFileFromUrl(data) {
+    async getFileFromUrl(data, key) {
         const barUrl = new url_1.URL(data.url);
         const strURL = barUrl.toString();
         const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
@@ -66,20 +69,19 @@ class InputFile {
         if (data.verb !== 'GET') {
         }
         const [response, body] = await httpRequest(options);
-        const tmpPath = await this.saveFile(body, 'temporary__' + nameFile.split('.')[0], '.' + nameFile.split('.')[1]);
+        const tmpPath = await this.saveFile(body, 'temporary__' + key, '.' + nameFile.split('.')[1]);
         return tmpPath;
     }
-    async getFileFromFileUrl(data) {
+    async getFileFromFileUrl(data, key) {
         const barUrl = new url_1.URL(data.url);
         const strURL = barUrl.toString();
         const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
         const content = await readFile(barUrl);
-        return await this.saveFile(content, 'temporary__' + nameFile.split('.')[0], '.' + nameFile.split('.')[1]);
+        return await this.saveFile(content, 'temporary__' + key, '.' + nameFile.split('.')[1]);
     }
-    async getFileFromString(data) {
+    async getFileFromString(data, key) {
         const content = new Buffer(data, 'base64');
-        this.numFile++;
-        return await this.saveFile(content, 'file' + this.numFile, '.txt');
+        return await this.saveFile(content, 'file' + key, '.txt');
     }
     async saveFile(content, prefix, postfix) {
         const tempPath = this.options.tmpFolder;

@@ -5,6 +5,7 @@ import * as util from 'util';
 import * as gn from './index';
 import * as fs from 'fs';
 import * as url from 'url';
+import * as uuid from 'uuid';
 // tslint:disable:no-var-requires
 
 const jsZip = require('jszip');
@@ -13,16 +14,15 @@ import * as path from 'path';
 
 // tslint:disable:no-console
 
-export class DocXPlugin implements IPlugin {
+export class FilePlugin implements IPlugin {
     public name?: string;
     public cpt = 0;
     // tslint:disable-next-line:max-line-length
     public async merge(data: string | IFile, input: gn.IBody): Promise<IPluginResult> {
         return await this.docXmerge(data, input);
     }
-    public generateRndmName(compteur: number): string {
-        this.cpt++;
-        return 'file_fusionned' + (compteur) + '.docx';
+    public generateRndmName(fileType: string): string {
+        return 'file__' + uuid.v4() + fileType;
     }
 
     // tslint:disable-next-line:max-line-length
@@ -77,7 +77,7 @@ export class DocXPlugin implements IPlugin {
 
             const buf = doc.getZip().generate({ type: 'nodebuffer' });
             if (input.outputFileName === '' || input.outputFileName === undefined) {
-                input.outputFileName = this.generateRndmName(1);
+                input.outputFileName = this.generateRndmName(input.type);
 
                 console.log(`File named: ${input.outputFileName}!`);
             }
