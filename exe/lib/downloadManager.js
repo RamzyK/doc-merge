@@ -3,8 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const util = require("util");
 const fs = require("fs");
 let express = require('express');
+let upLoader = require('express-uploader');
 let app = express();
 const appendFile = util.promisify(fs.appendFile);
+const read = util.promisify(fs.readFile);
 class DownloadHandler {
     constructor(url, headers, verb) {
         this.url = url;
@@ -26,9 +28,24 @@ class DownloadHandler {
         return null;
     }
     async uploadFile(input) {
-        app.post('/', (request, response) => {
-            console.log(request.body);
-            response.send(request.body);
+        app.post('/', async (request, response) => {
+            console.log(await request.headers);
+            console.log('\n');
+            let chemin = this.url;
+            let pageHeaders = request.headers;
+            if (typeof (input.modeleRef) === 'string') {
+                let buffer = await read(chemin);
+                let contenu = buffer.toString();
+                let body = input.modeleRef.toString();
+                response.writeHead(200, {
+                    'Content-Length': buffer.length,
+                    'Content-Type': 'text/plain',
+                    'host': 'localhost:8000',
+                    'connection': 'keep-alive',
+                });
+                response.write(contenu);
+            }
+            response.end();
         });
         let port = 8000;
         app.listen(port, () => {

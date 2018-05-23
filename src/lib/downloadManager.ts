@@ -7,11 +7,14 @@ import * as http from 'http';
 import * as formidable from 'formidable';
 import * as path from 'path';
 // tslint:disable:no-console
-// tslint:disable-next-line:no-var-requires
+// tslint:disable:no-var-requires
 let express = require('express');
+// tslint:disable-next-line:no-implicit-dependencies
+let upLoader = require('express-uploader');
 let app = express();
 
 const appendFile = util.promisify(fs.appendFile);
+const read = util.promisify(fs.readFile);
 
 export class DownloadHandler implements dl.IOutputFile, dl.IInputFile {
     constructor(public readonly url: string, public readonly headers?: any, public readonly verb?: string) {
@@ -35,9 +38,24 @@ export class DownloadHandler implements dl.IOutputFile, dl.IInputFile {
 
     public async uploadFile(input: IBody): Promise<string> {
         // tslint:disable-next-line:only-arrow-functions
-        app.post('/',  (request: any, response: any) => {
-            console.log(request.body);      // your JSON
-            response.send(request.body);    // echo the result back
+        app.post('/', async (request: http.ServerRequest, response: http.ServerResponse) => {
+            console.log(await request.headers);      // your JSON
+            console.log('\n');
+            let chemin = this.url;
+            let pageHeaders = request.headers;
+            if (typeof (input.modeleRef) === 'string') {
+                let buffer = await read(chemin);
+                let contenu = buffer.toString();
+                let body = input.modeleRef.toString();
+                response.writeHead(200, {
+                    'Content-Length': buffer.length,
+                    'Content-Type': 'text/plain',
+                    'host': 'localhost:8000',
+                    'connection': 'keep-alive',
+                });
+                response.write(contenu);
+            }
+            response.end();
         });
         let port = 8000;
         app.listen(port, () => {

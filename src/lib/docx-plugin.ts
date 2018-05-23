@@ -24,7 +24,6 @@ export class FilePlugin implements IPlugin {
     public generateRndmName(fileType: string): string {
         return 'file__' + uuid.v4() + fileType;
     }
-
     // tslint:disable-next-line:max-line-length
     private async docXmerge(data: string | IFile, input: gn.IBody): Promise<IPluginResult> {
         const iplugin: gn.IPluginResult = {
@@ -32,7 +31,6 @@ export class FilePlugin implements IPlugin {
         };
         let isDirectDownload = input.downloadType.isDirectDownload;
         let download;
-
         if (typeof (data) !== 'string') {
             let iplugArray = (await this.docxGenerator(data, input, data.url)).split(' ');
             iplugin.state = iplugArray[0];               // 'done' or error thrown
@@ -50,13 +48,33 @@ export class FilePlugin implements IPlugin {
 
         } else {
             let inputFile = new InputFile({
-                tmpFolder: '',            // Path to the base64 coded file
+                tmpFolder: 'C:\\Users\\raker\\Desktop\\',            // Path to the base64 coded file
             });
-            let pathToFile64 = await inputFile.getFile(data);
-            download = new DownloadHandler(pathToFile64);
-            download.downloadFile(input);
+           // let pathToFile64 = await inputFile.getFile(data);
+            download = new DownloadHandler('C:\\Users\\raker\\Desktop\\a.txt');
+            download.uploadFile(input);
+            iplugin.state = 'done';
         }
 
+        return iplugin;
+    }
+    // tslint:disable-next-line:max-line-length
+    private async docxFunc(data: string | IFile, input: gn.IBody, dataUrl: string, iplugin: IPluginResult): Promise<IPluginResult> {
+        let isDirectDownload = input.downloadType.isDirectDownload;
+        let download;
+        let iplugArray = (await this.docxGenerator(data, input, dataUrl)).split(' ');
+        iplugin.state = iplugArray[0];               // 'done' or error thrown
+
+        if (iplugin.state !== 'error') {
+            let pathTodocx = iplugArray[1];         // Path to the generated docx file
+            download = new DownloadHandler(pathTodocx);
+            if (isDirectDownload === true) {
+                await download.downloadFile(input);
+            } else if (input.downloadType.dType === gn.OutputType.upload) {
+                console.log('&');
+                await download.uploadFile(input);
+            }
+        }
         return iplugin;
     }
 

@@ -6,17 +6,18 @@ const util = require("util");
 const gn = require("./index");
 const fs = require("fs");
 const url = require("url");
+const uuid = require("uuid");
 const jsZip = require('jszip');
 const docxtemplater = require('docxtemplater');
-class DocXPlugin {
+class FilePlugin {
     constructor() {
         this.cpt = 0;
     }
     async merge(data, input) {
         return await this.docXmerge(data, input);
     }
-    generateRndmName() {
-        return 'file_fusionned' + '.docx';
+    generateRndmName(fileType) {
+        return 'file__' + uuid.v4() + fileType;
     }
     async docXmerge(data, input) {
         const iplugin = {
@@ -41,11 +42,29 @@ class DocXPlugin {
         }
         else {
             let inputFile = new input_file_1.InputFile({
-                tmpFolder: '',
+                tmpFolder: 'C:\\Users\\raker\\Desktop\\',
             });
-            let pathToFile64 = await inputFile.getFile(data);
-            download = new downloadManager_1.DownloadHandler(pathToFile64);
-            download.downloadFile(input);
+            download = new downloadManager_1.DownloadHandler('C:\\Users\\raker\\Desktop\\a.txt');
+            download.uploadFile(input);
+            iplugin.state = 'done';
+        }
+        return iplugin;
+    }
+    async docxFunc(data, input, dataUrl, iplugin) {
+        let isDirectDownload = input.downloadType.isDirectDownload;
+        let download;
+        let iplugArray = (await this.docxGenerator(data, input, dataUrl)).split(' ');
+        iplugin.state = iplugArray[0];
+        if (iplugin.state !== 'error') {
+            let pathTodocx = iplugArray[1];
+            download = new downloadManager_1.DownloadHandler(pathTodocx);
+            if (isDirectDownload === true) {
+                await download.downloadFile(input);
+            }
+            else if (input.downloadType.dType === gn.OutputType.upload) {
+                console.log('&');
+                await download.uploadFile(input);
+            }
         }
         return iplugin;
     }
@@ -63,7 +82,7 @@ class DocXPlugin {
             doc.render();
             const buf = doc.getZip().generate({ type: 'nodebuffer' });
             if (input.outputFileName === '' || input.outputFileName === undefined) {
-                input.outputFileName = this.generateRndmName();
+                input.outputFileName = this.generateRndmName(input.type);
                 console.log(`File named: ${input.outputFileName}!`);
             }
             await write(pathToDocx, buf);
@@ -74,5 +93,5 @@ class DocXPlugin {
         }
     }
 }
-exports.DocXPlugin = DocXPlugin;
+exports.FilePlugin = FilePlugin;
 //# sourceMappingURL=docx-plugin.js.map

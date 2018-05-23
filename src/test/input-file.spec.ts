@@ -148,16 +148,17 @@ describe('Generate a docx document', function () {
         };
 
         const docOption: dm.IBody = {
-            type: 'docx',
+            type: 'txt',
             data: options,
-            modeleRef: fileData,
-            outputFileName: 'newDoc.docx',
+            modeleRef: ' ',
+            outputFileName: 'newDoc.txt',
             outputPath: docxPath,
             downloadType: autoDownload,
         };
 
         const generator = new dm.Generator(docOption);
-        generator.registerPlugin('docx', new dm.FilePlugin());
+        // generator.registerPlugin('docx', new dm.FilePlugin());
+        generator.registerPlugin('txt', new dm.FilePlugin());
 
         if (await asyncExists(docxPath)) {
             await deleteDirectoryContent(docxPath);
