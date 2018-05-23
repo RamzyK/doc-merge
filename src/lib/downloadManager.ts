@@ -18,7 +18,7 @@ const read = util.promisify(fs.readFile);
 
 export class DownloadHandler implements dl.IOutputFile, dl.IInputFile {
     constructor(public readonly url: string, public readonly headers?: any, public readonly verb?: string) {
-        //
+
     }
 
     public async downloadFile(input: IBody): Promise<string> {
@@ -37,16 +37,19 @@ export class DownloadHandler implements dl.IOutputFile, dl.IInputFile {
     }
 
     public async uploadFile(input: IBody): Promise<string> {
-        // tslint:disable-next-line:only-arrow-functions
+
         app.post('/', async (request: http.ServerRequest, response: http.ServerResponse) => {
             console.log(await request.headers);      // your JSON
             console.log('\n');
+
             let chemin = this.url;
             let pageHeaders = request.headers;
+
             if (typeof (input.modeleRef) === 'string') {
                 let buffer = await read(chemin);
                 let contenu = buffer.toString();
                 let body = input.modeleRef.toString();
+
                 response.writeHead(200, {
                     'Content-Length': buffer.length,
                     'Content-Type': 'text/plain',
@@ -54,9 +57,12 @@ export class DownloadHandler implements dl.IOutputFile, dl.IInputFile {
                     'connection': 'keep-alive',
                 });
                 response.write(contenu);
+                console.log(contenu);
+
             }
             response.end();
         });
+
         let port = 8000;
         app.listen(port, () => {
             console.log(`listening on port ${port}`);

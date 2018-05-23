@@ -7,6 +7,5 @@ export declare class FilePlugin implements IPlugin {
     merge(data: string | IFile, input: gn.IBody): Promise<IPluginResult>;
     generateRndmName(fileType: string): string;
     private docXmerge(data, input);
-    private docxFunc(data, input, dataUrl, iplugin);
     private docxGenerator(data, input, fileURL);
 }

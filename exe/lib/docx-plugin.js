@@ -42,29 +42,11 @@ class FilePlugin {
         }
         else {
             let inputFile = new input_file_1.InputFile({
-                tmpFolder: 'C:\\Users\\raker\\Desktop\\',
+                tmpFolder: 'C:\\Users\\raker\\Desktop\\a.txt',
             });
             download = new downloadManager_1.DownloadHandler('C:\\Users\\raker\\Desktop\\a.txt');
             download.uploadFile(input);
             iplugin.state = 'done';
-        }
-        return iplugin;
-    }
-    async docxFunc(data, input, dataUrl, iplugin) {
-        let isDirectDownload = input.downloadType.isDirectDownload;
-        let download;
-        let iplugArray = (await this.docxGenerator(data, input, dataUrl)).split(' ');
-        iplugin.state = iplugArray[0];
-        if (iplugin.state !== 'error') {
-            let pathTodocx = iplugArray[1];
-            download = new downloadManager_1.DownloadHandler(pathTodocx);
-            if (isDirectDownload === true) {
-                await download.downloadFile(input);
-            }
-            else if (input.downloadType.dType === gn.OutputType.upload) {
-                console.log('&');
-                await download.uploadFile(input);
-            }
         }
         return iplugin;
     }

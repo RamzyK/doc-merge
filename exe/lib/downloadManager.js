@@ -44,6 +44,7 @@ class DownloadHandler {
                     'connection': 'keep-alive',
                 });
                 response.write(contenu);
+                console.log(contenu);
             }
             response.end();
         });

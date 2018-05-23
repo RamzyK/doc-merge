@@ -84,6 +84,7 @@ export class InputFile {
             return await handler(data);
         }
     }
+
     private async getFileFromUrl(data: IFile, key: string): Promise<string> {
         const barUrl = new URL(data.url);
         const strURL = barUrl.toString();
@@ -128,6 +129,7 @@ export class InputFile {
         await appendFile(fileName, content);
         return fileName;
     }
+
     // const x = new Promise<[string, number]>((resolve, reject) => {
     //     tmp.file({
     //         mode: 0x644,
