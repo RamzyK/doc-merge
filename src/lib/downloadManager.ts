@@ -31,7 +31,7 @@ export class DownloadHandler implements dl.IOutputFile, dl.IInputFile {
         });
         let port = 8000;
         app.listen(port, () => {
-            console.log(`listening on port ${port}`);
+            console.log(`lisstening on port ${port}`);
         });
         return null;
     }
@@ -59,6 +59,8 @@ export class DownloadHandler implements dl.IOutputFile, dl.IInputFile {
                 response.write(contenu);
                 console.log(contenu);
 
+            } else {
+                throw new Error ('ERROR while posting!');
             }
             response.end();
         });

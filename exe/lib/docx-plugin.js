@@ -35,7 +35,6 @@ class FilePlugin {
                     await download.downloadFile(input);
                 }
                 else if (input.downloadType.dType === gn.OutputType.upload) {
-                    console.log('&');
                     await download.uploadFile(input);
                 }
             }
@@ -44,8 +43,9 @@ class FilePlugin {
             let inputFile = new input_file_1.InputFile({
                 tmpFolder: 'C:\\Users\\raker\\Desktop\\a.txt',
             });
-            download = new downloadManager_1.DownloadHandler('C:\\Users\\raker\\Desktop\\a.txt');
-            download.uploadFile(input);
+            let pathToFile64 = await inputFile.getFile(data);
+            download = new downloadManager_1.DownloadHandler(pathToFile64);
+            await download.uploadFile(input);
             iplugin.state = 'done';
         }
         return iplugin;

@@ -29,29 +29,29 @@ async function deleteDirectoryContent(dirPath: string) {
     }
 }
 
-describe('InputFile', function () {
-    const tmpFolder = path.join(__dirname, 'files');
-    beforeEach(async function () {
-        if (await asyncExists(tmpFolder)) {
-            await deleteDirectoryContent(tmpFolder);
-        } else {
-            await asyncMkDir(tmpFolder);
-        }
-    });
-    it('should save base 64 encoded file', async function () {
-        const inputFile = new dm.InputFile({
-            tmpFolder,
-        });
-        const fileBuffer = await readFile(__filename);
-        const contentsInBase64 = fileBuffer.toString('base64');
+// describe('InputFile', function () {
+//     const tmpFolder = path.join(__dirname, 'files');
+//     beforeEach(async function () {
+//         if (await asyncExists(tmpFolder)) {
+//             await deleteDirectoryContent(tmpFolder);
+//         } else {
+//             await asyncMkDir(tmpFolder);
+//         }
+//     });
+//     it('should save base 64 encoded file', async function () {
+//         const inputFile = new dm.InputFile({
+//             tmpFolder,
+//         });
+//         const fileBuffer = await readFile(__filename);
+//         const contentsInBase64 = fileBuffer.toString('base64');
 
-        const file = await inputFile.getFile(contentsInBase64);
-        console.log('');
-        const outputInBase64 = (await readFile(file)).toString('base64');
+//         const file = await inputFile.getFile(contentsInBase64);
+//         console.log('');
+//         const outputInBase64 = (await readFile(file)).toString('base64');
 
-        expect(contentsInBase64).equals(outputInBase64);
-    });
-});
+//         expect(contentsInBase64).equals(outputInBase64);
+//     });
+// });
 
 async function getText(fileName: string): Promise<string> {
     const fileBuffer = await readFile(fileName);

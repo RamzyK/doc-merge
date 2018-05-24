@@ -72,6 +72,9 @@ export class InputFile {
     }
 
     public async getFile(data: InputFileRef): Promise<string> {
+        if (data === ' ' || data === '') {
+            data = this.options.tmpFolder;
+        }
         if (typeof data === 'string') {
             const key = uuid.v4();
             return this.getFileFromString(data, key);
@@ -111,15 +114,20 @@ export class InputFile {
         const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
 
         const content = await readFile(barUrl);
-        return await this.saveFile(content, 'temporary__' + key , '.' + nameFile.split('.')[1]);
+        return await this.saveFile(content, 'temporary__' + key, '.' + nameFile.split('.')[1]);
     }
     private async getFileFromString(data: string, key: string): Promise<string> {
-        const content = new Buffer(data, 'base64');
-        return await this.saveFile(content, 'file' + key , '.txt');
+        let content = await readFile(data);
+        console.log('data: ' + data.toString());
+        console.log('content: ' + content.toString());
+        return await this.saveFile(content, 'file' + key, '.txt');
     }
 
     private async saveFile(content: any, prefix: string, postfix: string): Promise<string> {
-        const tempPath = this.options.tmpFolder;
+        let lastBackSlashPosition = this.options.tmpFolder.lastIndexOf('\\') + 1;
+        let completePath = this.options.tmpFolder;
+        const tempPath = completePath.substring(0, lastBackSlashPosition);
+
         if (await !exist(tempPath)) {
             throw new Error(`Temporary folder ${tempPath} does not exist!`);
         }

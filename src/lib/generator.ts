@@ -6,7 +6,7 @@ export interface IPluginResult {
 }
 export interface IPlugin {
     name?: string;
-    merge(data: InputFileRef, input: IBody, fileName?: string): Promise<IPluginResult>;
+    merge(data: InputFileRef, input?: IBody, fileName?: string): Promise<IPluginResult>;
 }
 
 export interface IBody {
@@ -30,7 +30,12 @@ export class Generator {
     public async  docMerge(input: IBody): Promise<IPluginResult> {
         const plugIn: IPlugin = this.docExtention.get(input.type);
         if (plugIn) {
-            return plugIn.merge(input.modeleRef, input);
+            if (input.type === 'docx') {
+                return plugIn.merge(input.modeleRef, input);
+            } else {
+                return plugIn.merge(input.modeleRef, input);
+            }
+
         } else {
             throw new Error(`Plugin not registered for ${input.type}`);
         }

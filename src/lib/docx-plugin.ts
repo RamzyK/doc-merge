@@ -31,33 +31,44 @@ export class FilePlugin implements IPlugin {
         let isDirectDownload = input.downloadType.isDirectDownload;
         let download;
         if (typeof (data) !== 'string') {
-            let iplugArray = (await this.docxGenerator(data, input, data.url)).split(' ');
-            iplugin.state = iplugArray[0];               // 'done' or error thrown
-
-            if (iplugin.state !== 'error') {
-                let pathTodocx = iplugArray[1];         // Path to the generated docx file
-                download = new DownloadHandler(pathTodocx);
-                if (isDirectDownload === true) {
-                    await download.downloadFile(input);
-                } else if (input.downloadType.dType === gn.OutputType.upload) {
-                    console.log('&');
-                    await download.uploadFile(input);
-                }
+            if (input.type === 'txt') {
+                //
+            } else if (input.type === 'docx') {
+                let iplugArray = (await this.docxGenerator(data, input, data.url)).split(' ');
+                this.handlerDocxDownload(iplugArray, iplugin, download, input);
+                iplugin.state = 'done';
+            } else {
+                throw new Error('Unhandled type of file');
             }
 
         } else {
             let inputFile = new InputFile({
                 tmpFolder: 'C:\\Users\\raker\\Desktop\\a.txt',            // Path to the base64 coded file
             });
-            // let pathToFile64 = await inputFile.getFile(data);
-            download = new DownloadHandler('C:\\Users\\raker\\Desktop\\a.txt');
-            download.uploadFile(input);
+            let pathToFile64 = await inputFile.getFile(data);
+            download = new DownloadHandler(pathToFile64);
+            await download.uploadFile(input);
             iplugin.state = 'done';
         }
 
         return iplugin;
     }
 
+    // tslint:disable-next-line:max-line-length
+    private async handlerDocxDownload(array: string[], plugin: IPluginResult, download: any, input: gn.IBody): Promise<void> {
+        let autoDownload = input.downloadType.isDirectDownload;
+        if (array[0] !== 'error') {
+            let pathTodocx = array[1];         // Path to the generated docx file
+            download = new DownloadHandler(pathTodocx);
+            if (autoDownload === true) {
+                await download.downloadFile(input);
+            } else if (input.downloadType.dType === gn.OutputType.upload) {
+                await download.uploadFile(input);
+            }
+        } else {
+            throw new Error('Error generating docx file!');
+        }
+    }
     private async docxGenerator(data: string | IFile, input: gn.IBody, fileURL: string): Promise<string> {
         const read = util.promisify(fs.readFile);
         const write = util.promisify(fs.writeFile);
