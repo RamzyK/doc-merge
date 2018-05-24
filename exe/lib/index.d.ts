@@ -1,4 +1,3 @@
-export { IFile, IInputFileOptions, InputFile, InputFileRef, OutputType, IOutputMode, IInputFile, IOutputFile } from './input-ref/input-file';
-export { IPlugin, Generator, IBody, IPluginResult } from './generator';
+export { IFile, IInputFileOptions, InputFile, InputFileRef, IInputFile, IOutputFile } from './input-ref/input-file';
+export { IPluginOld, Generator, IBody, IPluginResult, isIBody, OutputType } from './generator';
 export { FilePlugin } from './docx-plugin';
-export { DownloadHandler } from './downloadManager';

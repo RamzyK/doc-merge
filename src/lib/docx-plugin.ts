@@ -1,6 +1,6 @@
-import { IPlugin, IPluginResult, Generator } from './generator';
+import { IPluginOld, IPluginResult, Generator, OutputType } from './generator';
 import { IFile, InputFile, } from './input-ref/input-file';
-import { DownloadHandler } from './downloadManager';
+// import { DownloadHandler } from './downloadManager';
 import * as util from 'util';
 import * as gn from './index';
 import * as fs from 'fs';
@@ -14,7 +14,7 @@ import * as path from 'path';
 
 // tslint:disable:no-console
 
-export class FilePlugin implements IPlugin {
+export class FilePlugin implements IPluginOld {
     public name?: string;
     public cpt = 0;
     public async merge(data: string | IFile, input: gn.IBody): Promise<IPluginResult> {
@@ -28,14 +28,14 @@ export class FilePlugin implements IPlugin {
         const iplugin: gn.IPluginResult = {
             state: '',
         };
-        let isDirectDownload = input.downloadType.isDirectDownload;
+        let isDirectDownload = input.outputType === OutputType.download;
         let download;
         if (typeof (data) !== 'string') {
             if (input.type === 'txt') {
                 //
             } else if (input.type === 'docx') {
                 let iplugArray = (await this.docxGenerator(data, input, data.url)).split(' ');
-                this.handlerDocxDownload(iplugArray, iplugin, download, input);
+                //  TODO this.handlerDocxDownload(iplugArray, iplugin, download, input);
                 iplugin.state = 'done';
             } else {
                 throw new Error('Unhandled type of file');
@@ -46,29 +46,30 @@ export class FilePlugin implements IPlugin {
                 tmpFolder: 'C:\\Users\\raker\\Desktop\\a.txt',            // Path to the base64 coded file
             });
             let pathToFile64 = await inputFile.getFile(data);
-            download = new DownloadHandler(pathToFile64);
-            await download.uploadFile(input);
+            // download = new DownloadHandler(pathToFile64);
+            // await download.uploadFile(input);
             iplugin.state = 'done';
         }
 
         return iplugin;
     }
 
-    // tslint:disable-next-line:max-line-length
-    private async handlerDocxDownload(array: string[], plugin: IPluginResult, download: any, input: gn.IBody): Promise<void> {
-        let autoDownload = input.downloadType.isDirectDownload;
-        if (array[0] !== 'error') {
-            let pathTodocx = array[1];         // Path to the generated docx file
-            download = new DownloadHandler(pathTodocx);
-            if (autoDownload === true) {
-                await download.downloadFile(input);
-            } else if (input.downloadType.dType === gn.OutputType.upload) {
-                await download.uploadFile(input);
-            }
-        } else {
-            throw new Error('Error generating docx file!');
-        }
-    }
+    // // tslint:disable-next-line:max-line-length
+    // private async handlerDocxDownload(
+    //    array: string[], plugin: IPluginResult, download: any, input: gn.IBody): Promise<void> {
+    //     let autoDownload = input.downloadType.isDirectDownload;
+    //     if (array[0] !== 'error') {
+    //         let pathTodocx = array[1];         // Path to the generated docx file
+    //         download = new DownloadHandler(pathTodocx);
+    //         if (autoDownload === true) {
+    //             await download.downloadFile(input);
+    //         } else if (input.downloadType.dType === gn.OutputType.upload) {
+    //             await download.uploadFile(input);
+    //         }
+    //     } else {
+    //         throw new Error('Error generating docx file!');
+    //     }
+    // }
     private async docxGenerator(data: string | IFile, input: gn.IBody, fileURL: string): Promise<string> {
         const read = util.promisify(fs.readFile);
         const write = util.promisify(fs.writeFile);

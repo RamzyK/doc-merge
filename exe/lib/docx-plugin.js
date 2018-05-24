@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const generator_1 = require("./generator");
 const input_file_1 = require("./input-ref/input-file");
-const downloadManager_1 = require("./downloadManager");
 const util = require("util");
-const gn = require("./index");
 const fs = require("fs");
 const url = require("url");
 const uuid = require("uuid");
@@ -23,20 +22,17 @@ class FilePlugin {
         const iplugin = {
             state: '',
         };
-        let isDirectDownload = input.downloadType.isDirectDownload;
+        let isDirectDownload = input.outputType === generator_1.OutputType.download;
         let download;
         if (typeof (data) !== 'string') {
-            let iplugArray = (await this.docxGenerator(data, input, data.url)).split(' ');
-            iplugin.state = iplugArray[0];
-            if (iplugin.state !== 'error') {
-                let pathTodocx = iplugArray[1];
-                download = new downloadManager_1.DownloadHandler(pathTodocx);
-                if (isDirectDownload === true) {
-                    await download.downloadFile(input);
-                }
-                else if (input.downloadType.dType === gn.OutputType.upload) {
-                    await download.uploadFile(input);
-                }
+            if (input.type === 'txt') {
+            }
+            else if (input.type === 'docx') {
+                let iplugArray = (await this.docxGenerator(data, input, data.url)).split(' ');
+                iplugin.state = 'done';
+            }
+            else {
+                throw new Error('Unhandled type of file');
             }
         }
         else {
@@ -44,8 +40,6 @@ class FilePlugin {
                 tmpFolder: 'C:\\Users\\raker\\Desktop\\a.txt',
             });
             let pathToFile64 = await inputFile.getFile(data);
-            download = new downloadManager_1.DownloadHandler(pathToFile64);
-            await download.uploadFile(input);
             iplugin.state = 'done';
         }
         return iplugin;

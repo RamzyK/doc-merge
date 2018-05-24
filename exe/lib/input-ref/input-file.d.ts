@@ -1,13 +1,4 @@
 export declare type InputFileRef = string | IFile;
-export declare enum OutputType {
-    download = 0,
-    url = 1,
-    upload = 2,
-}
-export interface IOutputMode {
-    isDirectDownload: boolean;
-    dType: OutputType;
-}
 export interface IFile {
     url: string;
     headers?: any;
@@ -29,5 +20,5 @@ export declare class InputFile {
     private getFileFromUrl(data, key);
     private getFileFromFileUrl(data, key);
     private getFileFromString(data, key);
-    private saveFile(content, prefix, postfix);
+    private saveFile(content, fileName);
 }

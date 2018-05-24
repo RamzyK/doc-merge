@@ -1,0 +1,1 @@
+{"version":3,"file":"async-handler.js","sourceRoot":"","sources":["../../src/lib/async-handler.ts"],"names":[],"mappings":";;AAGA,yBAAgC,YAAiC;IAC7D,OAAO,CAAC,GAAY,EAAE,GAAa,EAAE,IAAkB,EAAE,EAAE;QACvD,YAAY,CAAC,GAAG,EAAE,GAAG,EAAE,IAAI,CAAC;aACvB,KAAK,CAAC,IAAI,CAAC,CAAC;IACrB,CAAC,CAAC;AACN,CAAC;AALD,0CAKC"}

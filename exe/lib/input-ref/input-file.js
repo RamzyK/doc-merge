@@ -12,12 +12,6 @@ const readFile = util.promisify(fs.readFile);
 const exist = util.promisify(fs.exists);
 const appendFile = util.promisify(fs.appendFile);
 const asyncExists = util.promisify(fs.exists);
-var OutputType;
-(function (OutputType) {
-    OutputType[OutputType["download"] = 0] = "download";
-    OutputType[OutputType["url"] = 1] = "url";
-    OutputType[OutputType["upload"] = 2] = "upload";
-})(OutputType = exports.OutputType || (exports.OutputType = {}));
 async function httpRequest(options) {
     return new Promise((resolve, reject) => {
         request(options, (error, response, body) => {
@@ -36,18 +30,14 @@ class InputFile {
         this.numFile = 0;
         this.protocolHandlers = new Map();
         const httpHandler = this.getFileFromUrl.bind(this);
-        const key = uuid.v4();
-        const fileHndler = async (data) => await this.getFileFromFileUrl(data, key);
+        const fileHndler = this.getFileFromFileUrl.bind(this);
         this.protocolHandlers.set('http:', httpHandler);
         this.protocolHandlers.set('https:', httpHandler);
         this.protocolHandlers.set('file:', fileHndler);
     }
     async getFile(data) {
-        if (data === ' ' || data === '') {
-            data = this.options.tmpFolder;
-        }
+        const key = uuid.v4();
         if (typeof data === 'string') {
-            const key = uuid.v4();
             return this.getFileFromString(data, key);
         }
         else {
@@ -56,7 +46,7 @@ class InputFile {
             if (!handler) {
                 throw new Error(`Error: protocol unknown: ${data.url}`);
             }
-            return await handler(data);
+            return await handler(data, key);
         }
     }
     async getFileFromUrl(data, key) {
@@ -72,7 +62,7 @@ class InputFile {
         if (data.verb !== 'GET') {
         }
         const [response, body] = await httpRequest(options);
-        const tmpPath = await this.saveFile(body, 'temporary__' + key, '.' + nameFile.split('.')[1]);
+        const tmpPath = await this.saveFile(body, key);
         return tmpPath;
     }
     async getFileFromFileUrl(data, key) {
@@ -80,26 +70,21 @@ class InputFile {
         const strURL = barUrl.toString();
         const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
         const content = await readFile(barUrl);
-        return await this.saveFile(content, 'temporary__' + key, '.' + nameFile.split('.')[1]);
+        return await this.saveFile(content, key);
     }
     async getFileFromString(data, key) {
         let content = await readFile(data);
         console.log('data: ' + data.toString());
         console.log('content: ' + content.toString());
-        return await this.saveFile(content, 'file' + key, '.txt');
+        return await this.saveFile(content, key);
     }
-    async saveFile(content, prefix, postfix) {
-        let lastBackSlashPosition = this.options.tmpFolder.lastIndexOf('\\') + 1;
-        let completePath = this.options.tmpFolder;
-        const tempPath = completePath.substring(0, lastBackSlashPosition);
-        if (await !exist(tempPath)) {
-            throw new Error(`Temporary folder ${tempPath} does not exist!`);
+    async saveFile(content, fileName) {
+        if (await !exist(this.options.tmpFolder)) {
+            throw new Error(`Temporary folder ${this.options.tmpFolder} does not exist!`);
         }
-        prefix = prefix || '';
-        postfix = postfix || '.tmp';
-        const fileName = path.join(tempPath, prefix + postfix);
-        await appendFile(fileName, content);
-        return fileName;
+        const fullPath = fileName = path.join(this.options.tmpFolder, fileName);
+        await appendFile(fullPath, content);
+        return fullPath;
     }
 }
 exports.InputFile = InputFile;

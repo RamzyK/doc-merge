@@ -2,6 +2,36 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Lancer",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/exe/lib/app.js",
+            "stopOnEntry": false,
+            "args": [],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": null,
+            "runtimeExecutable": null,
+            "runtimeArgs": [
+                "--nolazy",
+                "-r",
+                "ts-node/register"
+            ],
+            "env": {
+                "NODE_ENV": "development",
+                "PORT": "3000"
+            },
+            "console": "internalConsole",
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceRoot}/exe/**/*.js",
+                "${workspaceRoot}/node_modules/boc/exe/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**/*.js"
+            ],
+            "protocol": "inspector"
+        },
+        {
             "name": "Test debug",
             "type": "node",
             "request": "launch",

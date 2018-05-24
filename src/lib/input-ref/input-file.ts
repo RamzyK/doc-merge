@@ -16,16 +16,6 @@ const asyncExists = util.promisify(fs.exists);
 
 export type InputFileRef = string | IFile;
 
-export enum OutputType {
-    download,
-    url,
-    upload,
-}
-export interface IOutputMode {
-    isDirectDownload: boolean;
-    dType: OutputType;
-
-}
 export interface IFile {
     url: string;
     headers?: any;
@@ -55,16 +45,16 @@ async function httpRequest(options: request.Options): Promise<[request.Response,
     });
 }
 
+type GetFileHandler = (data: IFile, key: string) => Promise<string>;
 export class InputFile {
     private numFile = 0;
-    private readonly protocolHandlers: Map<string, (data: IFile) => Promise<string>>;
+    private readonly protocolHandlers: Map<string, GetFileHandler>;
 
     constructor(private readonly options: IInputFileOptions) {
-        this.protocolHandlers = new Map<string, (data: IFile) => Promise<string>>();
+        this.protocolHandlers = new Map<string, (data: IFile, key: string) => Promise<string>>();
 
         const httpHandler = this.getFileFromUrl.bind(this);
-        const key = uuid.v4();
-        const fileHndler = async (data: IFile) => await this.getFileFromFileUrl(data, key);
+        const fileHndler = this.getFileFromFileUrl.bind(this);
 
         this.protocolHandlers.set('http:', httpHandler);
         this.protocolHandlers.set('https:', httpHandler);
@@ -72,11 +62,8 @@ export class InputFile {
     }
 
     public async getFile(data: InputFileRef): Promise<string> {
-        if (data === ' ' || data === '') {
-            data = this.options.tmpFolder;
-        }
+        const key = uuid.v4();
         if (typeof data === 'string') {
-            const key = uuid.v4();
             return this.getFileFromString(data, key);
         } else {
             const barUrl = new URL(data.url);
@@ -84,7 +71,7 @@ export class InputFile {
             if (!handler) {
                 throw new Error(`Error: protocol unknown: ${data.url}`);
             }
-            return await handler(data);
+            return await handler(data, key);
         }
     }
 
@@ -104,7 +91,7 @@ export class InputFile {
             // todo set request.body
         }
         const [response, body] = await httpRequest(options);
-        const tmpPath = await this.saveFile(body, 'temporary__' + key, '.' + nameFile.split('.')[1]);
+        const tmpPath = await this.saveFile(body,  key);
         return tmpPath;
     }
 
@@ -114,28 +101,24 @@ export class InputFile {
         const nameFile = strURL.substring(strURL.lastIndexOf('/') + 1);
 
         const content = await readFile(barUrl);
-        return await this.saveFile(content, 'temporary__' + key, '.' + nameFile.split('.')[1]);
+        return await this.saveFile(content,  key);
     }
     private async getFileFromString(data: string, key: string): Promise<string> {
         let content = await readFile(data);
         console.log('data: ' + data.toString());
         console.log('content: ' + content.toString());
-        return await this.saveFile(content, 'file' + key, '.txt');
+        return await this.saveFile(content, key);
     }
 
-    private async saveFile(content: any, prefix: string, postfix: string): Promise<string> {
-        let lastBackSlashPosition = this.options.tmpFolder.lastIndexOf('\\') + 1;
-        let completePath = this.options.tmpFolder;
-        const tempPath = completePath.substring(0, lastBackSlashPosition);
+    private async saveFile(content: any, fileName: string): Promise<string> {
 
-        if (await !exist(tempPath)) {
-            throw new Error(`Temporary folder ${tempPath} does not exist!`);
+        if (await !exist(this.options.tmpFolder)) {
+            throw new Error(`Temporary folder ${this.options.tmpFolder} does not exist!`);
         }
-        prefix = prefix || '';
-        postfix = postfix || '.tmp';
-        const fileName = path.join(tempPath, prefix + postfix);
-        await appendFile(fileName, content);
-        return fileName;
+
+        const fullPath = fileName = path.join(this.options.tmpFolder, fileName);
+        await appendFile(fullPath, content);
+        return fullPath;
     }
 
     // const x = new Promise<[string, number]>((resolve, reject) => {
