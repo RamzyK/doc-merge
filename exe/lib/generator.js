@@ -25,6 +25,8 @@ class Generator {
                 break;
             case OutputType.upload:
                 break;
+            default:
+                console.log('default case');
         }
     }
     async generate(input) {

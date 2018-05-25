@@ -29,6 +29,7 @@ export function isIBody(data: any): data is IBody {
     // TODO test data.modelRef is IInputFile
     return data && data.type && data.modeleRef && data.data;
 }
+// tslint:disable:no-console
 export class Generator {
     private readonly _tmpFolder: string;
     private readonly docExtention: Map<string, IPlugin>;
@@ -51,8 +52,11 @@ export class Generator {
             case OutputType.upload:
                 // upload file
                 break;
+            default:
+            console.log('default case');
         }
     }
+
     public async generate(input: IBody): Promise<IPluginOutput> {
         const plugIn: IPlugin = this.docExtention.get(input.type);
         if (!plugIn) {

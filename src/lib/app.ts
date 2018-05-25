@@ -12,21 +12,18 @@ export interface IAppOptions {
 export class App {
 
     private _server: http.Server;
-
+    private express: express.Express;
     private readonly _generator: Generator;
     public get server() {
         return this._server;
     }
-    private express: express.Express;
     public get options(): IAppOptions {
         return this._options;
     }
     constructor(private readonly _options: IAppOptions) {
-
         this.express = express();
         this.express.use(bodyParser.json({ type: ['application/json', 'application/json-patch+json'] }));
         this.express.use('/merge', asyncMiddleware(this.mergeHandler.bind(this)));
-
         this._generator = new Generator(_options.tmpFolder);
         this._generator.registerPlugin('echo', new EchoPlugin());
     }
@@ -56,8 +53,8 @@ export class App {
             });
         });
     }
-    private async mergeHandler(
-        request: express.Request, response: express.Response, next: express.NextFunction): Promise<void> {
+    // tslint:disable-next-line:max-line-length
+    private async mergeHandler(request: express.Request, response: express.Response, next: express.NextFunction): Promise<void> {
         const body: any = request.body;
         if (!body || !isIBody(body)) {
             throw new Error('Bad request');
@@ -67,13 +64,14 @@ export class App {
 }
 
 async function test() {
+
     const appOptions: IAppOptions = {
         port: 8555,
         tmpFolder: '',
     };
-
     const app = new App(appOptions);
     await app.start();
+
     // tslint:disable-next-line:no-console
     console.log('Listening on port ' + app.server.address().port);
 }
