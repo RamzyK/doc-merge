@@ -1,6 +1,6 @@
 import { InputFileRef, IFile, InputFile } from './input-ref/input-file';
 import { IPluginInput, IPlugin, IPluginOutput } from './generateur/index';
-
+// tslint:disable:max-line-length
 // tslint:disable-next-line:no-empty-interface
 export interface IPluginResult {
     state: string;
@@ -53,7 +53,7 @@ export class Generator {
                 // upload file
                 break;
             default:
-            console.log('default case');
+                console.log('default case');
         }
     }
 
@@ -67,12 +67,13 @@ export class Generator {
         const modelFileName = await inputFile.getFile(input.modeleRef);
 
         const pluginInput: IPluginInput = {
-            data: input.data,
             modelFileName,
+            data: input.data,
             outputFileName: input.outputFileName,
         };
 
-        return await plugIn.generate(pluginInput);
+        return await plugIn.generate(pluginInput);  // TODO lundi: Créer class implement IPlugin et ré-implémenter generate dessus
+
     }
     public async registerPlugin(type: string, plugin: IPlugin): Promise<void> {
         this.docExtention.set(type, plugin);
