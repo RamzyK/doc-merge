@@ -3,6 +3,8 @@ import * as fs from 'fs';
 export const readFile = promisify(fs.readFile);
 export const saveFile = promisify(fs.writeFile);
 
+export const exists = promisify(fs.exists);
+
 export async function getFileAsBase64(fileName: string): Promise<string> {
     const fileBuffer = await readFile(fileName);
     const contentsInBase64 = fileBuffer.toString('base64');

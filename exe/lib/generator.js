@@ -37,8 +37,8 @@ class Generator {
         const inputFile = new input_file_1.InputFile({ tmpFolder: this._tmpFolder });
         const modelFileName = await inputFile.getFile(input.modeleRef);
         const pluginInput = {
-            data: input.data,
             modelFileName,
+            data: input.data,
             outputFileName: input.outputFileName,
         };
         return await plugIn.generate(pluginInput);

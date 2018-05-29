@@ -21,6 +21,9 @@ class App {
     get options() {
         return this._options;
     }
+    get generator() {
+        return this._generator;
+    }
     async start() {
         if (this._server) {
             return this._server;
