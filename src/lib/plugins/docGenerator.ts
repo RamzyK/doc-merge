@@ -1,5 +1,5 @@
 import * as util from 'util';
-import * as gn from './index';
+import * as gn from '../generateur/index';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as url from 'url';
@@ -14,9 +14,9 @@ const exist = util.promisify(fs.exists);
 const appendFile = util.promisify(fs.appendFile);
 
 // tslint:disable:no-console
-class DocGenerator implements gn.IPlugin {
+export class DocGenerator implements gn.IPlugin {
 
-    constructor(private readonly inputOptions: gn.IPluginInput) {
+    constructor() {
         //
     }
     public async  generate(input: gn.IPluginInput): Promise<gn.IPluginOutput> {
@@ -28,7 +28,7 @@ class DocGenerator implements gn.IPlugin {
 
         if (type === 'txt') {
             const content = new Buffer(input.modelFileName, 'base64');
-            return await this.saveFile(content, outputFile);
+            return await this.saveFile(content, input.modelFileName, outputFile);
         } else if (type === 'docx') {
             return await this.generateDocx(input, outputFile);
         } else {
@@ -51,19 +51,20 @@ class DocGenerator implements gn.IPlugin {
             const buf = doc.getZip().generate({ type: 'nodebuffer' });
             output.contentType = 'docx';
 
-            return await this.saveFile(buf, output);
+            return await this.saveFile(buf, fileInput.modelFileName, output);
         }
 
     }
 
-    private async saveFile(content: any, outputFile: gn.IPluginOutput): Promise<gn.IPluginOutput> {
+    private async saveFile(content: any, fileName: string, outputFile: gn.IPluginOutput): Promise<gn.IPluginOutput> {
         const folderPath = 'C:\\Users\\raker\\Desktop\\docGenerator\\';     // Dossier où stocker les fichiers
-        if (await exist(folderPath + this.inputOptions.modelFileName)) {
+        if (await exist(folderPath + fileName)) {
             throw new Error(`File already exist!`);
         }
 
         const fullPath = path.join(folderPath, outputFile.outputFileName);
         await appendFile(fullPath, content);
+        outputFile.outputFileName = fullPath;
         return outputFile;
     }
 

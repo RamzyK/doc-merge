@@ -20,6 +20,9 @@ export class App {
     public get options(): IAppOptions {
         return this._options;
     }
+    public get generator(): Generator {
+        return this._generator;
+    }
     constructor(private readonly _options: IAppOptions) {
         this.express = express();
         this.express.use(bodyParser.json({ type: ['application/json', 'application/json-patch+json'] }));
