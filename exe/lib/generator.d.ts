@@ -1,6 +1,7 @@
-/// <reference types="express-serve-static-core" />
+/// <reference types="express" />
 import { InputFileRef } from './input-ref/input-file';
 import { IPlugin, IPluginOutput } from './generateur/index';
+import * as express from 'express';
 export interface IPluginResult {
     state: string;
 }
@@ -23,12 +24,13 @@ export interface IBody {
     outputPath?: string;
     outputType: OutputType;
 }
-export declare function isIBody(data: any): data is IBody;
+export declare function isIBody(body: any): body is IBody;
 export declare class Generator {
     private readonly _tmpFolder;
     private readonly docExtention;
     constructor(tmpFolder: string);
-    docMerge(input: IBody, response: Express.Response): Promise<void>;
+    docMerge(input: IBody, response: express.Response): Promise<void>;
     generate(input: IBody): Promise<IPluginOutput>;
     registerPlugin(type: string, plugin: IPlugin): Promise<void>;
+    private sendFile(response, pluginOutput);
 }

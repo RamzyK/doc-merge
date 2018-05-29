@@ -1,5 +1,8 @@
 import { InputFileRef, IFile, InputFile } from './input-ref/input-file';
 import { IPluginInput, IPlugin, IPluginOutput } from './generateur/index';
+import * as path from 'path';
+import * as express from 'express';
+import * as uuid from 'uuid';
 // tslint:disable:max-line-length
 // tslint:disable-next-line:no-empty-interface
 export interface IPluginResult {
@@ -38,13 +41,14 @@ export class Generator {
         this.docExtention = new Map<string, IPlugin>();
     }
 
-    public async docMerge(input: IBody, response: Express.Response): Promise<void> {
+    public async docMerge(input: IBody, response: express.Response): Promise<void> {
         const generateOutput = await this.generate(input);
 
         // formater le response
 
         switch (input.outputType) {
             case OutputType.download:
+                await this.sendFile(response, generateOutput);
                 break;
             case OutputType.url:
                 // return file url
@@ -56,7 +60,6 @@ export class Generator {
                 console.log('default case');
         }
     }
-
     public async generate(input: IBody): Promise<IPluginOutput> {
         const plugIn: IPlugin = this.docExtention.get(input.type);
         if (!plugIn) {
@@ -65,11 +68,11 @@ export class Generator {
         // Transformer input => IPluginInput
         const inputFile = new InputFile({ tmpFolder: this._tmpFolder });
         const modelFileName = await inputFile.getFile(input.modeleRef);
-
+        const outputFileName = path.join(this._tmpFolder, uuid.v4());
         const pluginInput: IPluginInput = {
             modelFileName,
             data: input.data,
-            outputFileName: input.outputFileName,
+            outputFileName,
         };
 
         return await plugIn.generate(pluginInput);  // TODO lundi: Créer class implement IPlugin et ré-implémenter generate dessus
@@ -78,4 +81,8 @@ export class Generator {
     public async registerPlugin(type: string, plugin: IPlugin): Promise<void> {
         this.docExtention.set(type, plugin);
     }
+    private async sendFile(response: express.Response, pluginOutput: IPluginOutput) {
+        response.download(pluginOutput.outputFileName);
+    }
+
 }

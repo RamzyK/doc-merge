@@ -13,7 +13,9 @@ describe('Generator', function () {
     it('simple output', async function () {
         const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
         // TODO creer le repertoire (et le vider)
-        const modelUrl = ''; // TODO file:// + chemin vers model.docx;
+
+        // TODO file:// + chemin vers model.docx;
+        const modelUrl = 'file://C:/Projects/Phenix/doc-merge/src/test/docx-generator-data/model.docx';
         const app = new dm.App({
             port: 0,
             tmpFolder,
@@ -25,14 +27,15 @@ describe('Generator', function () {
 
             const body: dm.IBody = {
                 data: {},
-                modeleRef: modelUrl,
+                modeleRef: { url: modelUrl },
                 type: 'docx',
                 outputType: dm.OutputType.download,
             };
 
             const testUrl = `http://localhost:${port}/merge`;
 
-            const requestResponse = await new Promise((resolve, reject) => {
+
+            const requestResponse = await new Promise<request.Response>((resolve, reject) => {
                 request.post(testUrl,
                     {
                         body: JSON.stringify(body),
@@ -47,6 +50,8 @@ describe('Generator', function () {
                         }
                     });
             });
+
+            requestResponse.pipe(fs.createWriteStream(path.join(tmpFolder, 'output.docx')));
 
         } finally {
             await app.stop();
