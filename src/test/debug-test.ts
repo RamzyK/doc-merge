@@ -4,7 +4,7 @@ import 'mocha';
 // to test only test 'y' in suite 'x':
 // const testToDebug = 'x y';
 // ex:
-const testToDebug: string = 'DocGenerator Merge file';
+const testToDebug: string = 'Generator simple output';
 
 beforeEach(function () {
     // tslint:disable-next-line:no-this-assignment

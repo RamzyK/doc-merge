@@ -8,3 +8,4 @@ export { IPlugin }
     from './generateur/plugin';
 export { DocGenerator }
     from './plugins/docGenerator';
+export { App } from './app';

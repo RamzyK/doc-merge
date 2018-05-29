@@ -10,4 +10,6 @@ var docx_plugin_1 = require("./docx-plugin");
 exports.FilePlugin = docx_plugin_1.FilePlugin;
 var docGenerator_1 = require("./plugins/docGenerator");
 exports.DocGenerator = docGenerator_1.DocGenerator;
+var app_1 = require("./app");
+exports.App = app_1.App;
 //# sourceMappingURL=index.js.map

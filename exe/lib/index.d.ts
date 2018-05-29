@@ -3,3 +3,4 @@ export { IPluginOld, Generator, IBody, IPluginResult, isIBody, OutputType } from
 export { FilePlugin } from './docx-plugin';
 export { IPlugin } from './generateur/plugin';
 export { DocGenerator } from './plugins/docGenerator';
+export { App } from './app';

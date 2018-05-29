@@ -6,6 +6,7 @@ const http = require("http");
 const generator_1 = require("./generator");
 const async_handler_1 = require("./async-handler");
 const echo_plugin_1 = require("./plugins/echo-plugin");
+const index_1 = require("./index");
 class App {
     constructor(_options) {
         this._options = _options;
@@ -14,6 +15,7 @@ class App {
         this.express.use('/merge', async_handler_1.asyncMiddleware(this.mergeHandler.bind(this)));
         this._generator = new generator_1.Generator(_options.tmpFolder);
         this._generator.registerPlugin('echo', new echo_plugin_1.EchoPlugin());
+        this._generator.registerPlugin('docx', new index_1.DocGenerator());
     }
     get server() {
         return this._server;
@@ -55,14 +57,4 @@ class App {
     }
 }
 exports.App = App;
-async function test() {
-    const appOptions = {
-        port: 8555,
-        tmpFolder: '',
-    };
-    const app = new App(appOptions);
-    await app.start();
-    console.log('Listening on port ' + app.server.address().port);
-}
-test();
 //# sourceMappingURL=app.js.map

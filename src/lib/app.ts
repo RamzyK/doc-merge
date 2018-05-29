@@ -4,6 +4,7 @@ import * as http from 'http';
 import { isIBody, Generator } from './generator';
 import { asyncMiddleware } from './async-handler';
 import { EchoPlugin } from './plugins/echo-plugin';
+import { DocGenerator } from './index';
 
 export interface IAppOptions {
     port?: number;
@@ -29,6 +30,7 @@ export class App {
         this.express.use('/merge', asyncMiddleware(this.mergeHandler.bind(this)));
         this._generator = new Generator(_options.tmpFolder);
         this._generator.registerPlugin('echo', new EchoPlugin());
+        this._generator.registerPlugin('docx', new DocGenerator());
     }
 
     public async start(): Promise<http.Server> {
@@ -56,8 +58,9 @@ export class App {
             });
         });
     }
-    // tslint:disable-next-line:max-line-length
-    private async mergeHandler(request: express.Request, response: express.Response, next: express.NextFunction): Promise<void> {
+
+    private async mergeHandler(
+        request: express.Request, response: express.Response, next: express.NextFunction): Promise<void> {
         const body: any = request.body;
         if (!body || !isIBody(body)) {
             throw new Error('Bad request');
@@ -65,18 +68,3 @@ export class App {
         await this._generator.docMerge(body, response);
     }
 }
-
-async function test() {
-
-    const appOptions: IAppOptions = {
-        port: 8555,
-        tmpFolder: '',
-    };
-    const app = new App(appOptions);
-    await app.start();
-
-    // tslint:disable-next-line:no-console
-    console.log('Listening on port ' + app.server.address().port);
-}
-
-test();

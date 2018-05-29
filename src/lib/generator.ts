@@ -20,14 +20,14 @@ export interface IBody {
     schema?: string;
     culture?: string;
     modeleRef: InputFileRef;
-    outputFileName: string;
+    outputFileName?: string;
     // TODO: outputPath => config
-    outputPath: string;
+    outputPath?: string;
     outputType: OutputType;
 }
-export function isIBody(data: any): data is IBody {
+export function isIBody(body: any): body is IBody {
     // TODO test data.modelRef is IInputFile
-    return data && data.type && data.modeleRef && data.data;
+    return body && body.type && body.modeleRef && body.data;
 }
 // tslint:disable:no-console
 export class Generator {

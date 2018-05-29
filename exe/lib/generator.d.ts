@@ -19,8 +19,8 @@ export interface IBody {
     schema?: string;
     culture?: string;
     modeleRef: InputFileRef;
-    outputFileName: string;
-    outputPath: string;
+    outputFileName?: string;
+    outputPath?: string;
     outputType: OutputType;
 }
 export declare function isIBody(data: any): data is IBody;
