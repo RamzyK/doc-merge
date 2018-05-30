@@ -36,7 +36,7 @@ describe('Generator', function () {
             await deleteDirectoryContent(tmpFolder);
         }
         // TODO file:// + chemin vers model.docx;
-        const modelUrl = 'file:\\\\' +  path.join(__dirname, '..\\..\\src\\test\\docx-generator-data', 'model.docx');
+        const modelUrl = 'file:\\\\' + path.join(__dirname, '..\\..\\src\\test\\docx-generator-data', 'model.docx');
 
         const app = new dm.App({
             port: 0,
@@ -53,24 +53,21 @@ describe('Generator', function () {
             };
 
             const testUrl = `http://localhost:${port}/merge`;
-            const requestResponse = await new Promise<request.Response>((resolve, reject) => {
-                request.post(testUrl,
+            const requestResponse = await new Promise<void>((resolve, reject) => {
+                let r = request.post(testUrl,
                     {
                         body: JSON.stringify(body),
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                    }, (error: any, response: request.Response, responseBody: any) => {
-                        if (error) {
-                            reject(error);
-                        } else {
-                            resolve(response);
-                        }
                     });
+                r.on('error', (error: any) => {
+                    reject(error);
+                });
+                let output = fs.createWriteStream(path.join(tmpFolder, 'output.docx'));
+                r.pipe(output);
+                output.on('finish', () => resolve());
             });
-
-            requestResponse.pipe(fs.createWriteStream(path.join(tmpFolder, 'output.docx')));
-
         } finally {
             await app.stop();
         }
