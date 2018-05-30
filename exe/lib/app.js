@@ -7,12 +7,16 @@ const generator_1 = require("./generator");
 const async_handler_1 = require("./async-handler");
 const echo_plugin_1 = require("./plugins/echo-plugin");
 const index_1 = require("./index");
+const fs = require("fs");
+const util = require("util");
+const exist = util.promisify(fs.exists);
 class App {
     constructor(_options) {
         this._options = _options;
         this.express = express();
         this.express.use(bodyParser.json({ type: ['application/json', 'application/json-patch+json'] }));
         this.express.use('/merge', async_handler_1.asyncMiddleware(this.mergeHandler.bind(this)));
+        this.express.use('/download', async_handler_1.asyncMiddleware(this.downloadHandler.bind(this)));
         this._generator = new generator_1.Generator(_options.tmpFolder);
         this._generator.registerPlugin('echo', new echo_plugin_1.EchoPlugin());
         this._generator.registerPlugin('docx', new index_1.DocGenerator());
@@ -54,6 +58,23 @@ class App {
             throw new Error('Bad request');
         }
         await this._generator.docMerge(body, response);
+    }
+    async downloadHandler(request, response, next) {
+        let app = require('express');
+        let pathToFile;
+        app.get('/download/:fileName', async (rqst, resp, nxt) => {
+            pathToFile = rqst.params.fileName;
+            if (!exist(pathToFile)) {
+                throw new Error(`Le fichier ${pathToFile} n'existe pas`);
+            }
+            let downloadedFile = {
+                outputFileName: pathToFile,
+                contentType: 'docx',
+            };
+            resp.download(pathToFile);
+            return await downloadedFile;
+        });
+        return pathToFile;
     }
 }
 exports.App = App;

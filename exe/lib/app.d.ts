@@ -17,4 +17,5 @@ export declare class App {
     start(): Promise<http.Server>;
     stop(): Promise<void>;
     private mergeHandler(request, response, next);
+    private downloadHandler(request, response, next);
 }

@@ -24,7 +24,6 @@ export interface IBody {
     culture?: string;
     modeleRef: InputFileRef;
     outputFileName?: string;
-    // TODO: outputPath => config
     outputPath?: string;
     outputType: OutputType;
 }
