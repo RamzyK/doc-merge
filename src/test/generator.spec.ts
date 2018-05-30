@@ -28,16 +28,16 @@ async function deleteDirectoryContent(dirPath: string) {
 describe('Generator', function () {
     it('simple output', async function () {
         const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
+
         // TODO creer le repertoire (et le vider)
         if (await !exists(tmpFolder)) {
             await asyncMkDir(tmpFolder);
         } else {
             await deleteDirectoryContent(tmpFolder);
         }
-
         // TODO file:// + chemin vers model.docx;
         const modelUrl = 'file:\\\\' +  path.join(__dirname, '..\\..\\src\\test\\docx-generator-data', 'model.docx');
-        console.log(modelUrl);
+
         const app = new dm.App({
             port: 0,
             tmpFolder,
