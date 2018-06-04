@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const util = require("util");
 const fs = require("../tools/fs");
 const docxtemplater = require('docxtemplater');
 const jsZip = require('jszip');
+const exists = util.promisify(fs.exists);
 class DocGenerator {
     constructor() {
     }

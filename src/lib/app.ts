@@ -7,11 +7,15 @@ import { EchoPlugin } from './plugins/echo-plugin';
 import { DocGenerator } from './index';
 import * as fs from 'fs';
 import * as util from 'util';
+import * as path from 'path';
+
 import { IPluginOutput } from './generateur/index';
 
 // tslint:disable:max-line-length
-
+// tslint:disable:no-var-requires
+let app = require('express');
 const exist = util.promisify(fs.exists);
+
 export interface IAppOptions {
     port?: number;
     tmpFolder: string;
@@ -34,7 +38,7 @@ export class App {
         this.express = express();
         this.express.use(bodyParser.json({ type: ['application/json', 'application/json-patch+json'] }));
         this.express.use('/merge', asyncMiddleware(this.mergeHandler.bind(this)));
-        this.express.use('/download', asyncMiddleware(this.downloadHandler.bind(this)));
+        this.express.get('/download/:file', asyncMiddleware(this.downloadHandler.bind(this)));
         this._generator = new Generator(_options.tmpFolder);
         this._generator.registerPlugin('echo', new EchoPlugin());
         this._generator.registerPlugin('docx', new DocGenerator());
@@ -66,29 +70,23 @@ export class App {
         });
     }
 
+    public async downloadHandler(request: express.Request, response: express.Response, next: express.NextFunction): Promise<number> {
+        const file: string = request.params.file;
+        const pathToFile = path.join(this._options.tmpFolder, 'src\\test\\docx-generator-data', file);
+        let resp: number;
+        if (!exist(pathToFile)) {
+            throw new Error(`Le fichier ${pathToFile} n'existe pas`);
+        }
+        response.download(pathToFile, file);
+        resp = response.statusCode;
+        return resp;
+    }
+
     private async mergeHandler(request: express.Request, response: express.Response, next: express.NextFunction): Promise<void> {
         const body: any = request.body;
         if (!body || !isIBody(body)) {
             throw new Error('Bad request');
         }
         await this._generator.docMerge(body, response);
-    }
-
-    private async downloadHandler(request: express.Request, response: express.Response, next: express.NextFunction): Promise<string> {
-        let app = require('express');
-        let pathToFile: string;
-        app.get('/download/:fileName', async (rqst: express.Request, resp: express.Response, nxt: express.NextFunction): Promise<IPluginOutput> => {
-            pathToFile = rqst.params.fileName;
-            if (!exist(pathToFile)) {
-                throw new Error(`Le fichier ${pathToFile} n'existe pas`);
-            }
-            let downloadedFile: IPluginOutput = {
-                outputFileName: pathToFile,
-                contentType: 'docx',
-            };
-            resp.download(pathToFile);
-            return await downloadedFile;
-        });
-        return pathToFile;
     }
 }

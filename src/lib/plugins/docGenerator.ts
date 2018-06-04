@@ -8,7 +8,7 @@ import * as uuid from 'uuid';
 // tslint:disable:no-var-requires
 const docxtemplater = require('docxtemplater');
 const jsZip = require('jszip');
-
+const exists = util.promisify(fs.exists);
 // tslint:disable:no-console
 export class DocGenerator implements gn.IPlugin {
 
