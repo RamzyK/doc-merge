@@ -1,74 +1,74 @@
-// import * as dl from './input-ref/input-file';
-// import * as util from 'util';
-// import * as fs from 'fs';
-// import { IBody } from './index';
-// import * as http from 'http';
-// // tslint:disable-next-line:no-implicit-dependencies
-// import * as formidable from 'formidable';
-// import * as path from 'path';
-// // tslint:disable:no-console
-// // tslint:disable:no-var-requires
-// let express = require('express');
-// // tslint:disable-next-line:no-implicit-dependencies
-// let upLoader = require('express-uploader');
-// let app = express();
+import * as dl from './input-ref/input-file';
+import * as util from 'util';
+import * as fs from 'fs';
+import { IBody } from './index';
+import * as http from 'http';
+// tslint:disable-next-line:no-implicit-dependencies
+import * as formidable from 'formidable';
+import * as path from 'path';
+// tslint:disable:no-console
+// tslint:disable:no-var-requires
+let express = require('express');
+// tslint:disable-next-line:no-implicit-dependencies
+let upLoader = require('express-uploader');
+let app = express();
 
-// const appendFile = util.promisify(fs.appendFile);
-// const read = util.promisify(fs.readFile);
+const appendFile = util.promisify(fs.appendFile);
+const read = util.promisify(fs.readFile);
 
-// export class DownloadHandler implements dl.IOutputFile, dl.IInputFile {
-//     constructor(public readonly url: string, public readonly headers?: any, public readonly verb?: string) {
+export class DownloadHandler implements dl.IOutputFile, dl.IInputFile {
+    constructor(public readonly url: string, public readonly headers?: any, public readonly verb?: string) {
 
-//     }
+    }
 
-//     public async downloadFile(input: IBody): Promise<string> {
-//         let destination = this.url;
-//         app.get('/download', (req: any, res: any) => {
-//             if (input.downloadType.isDirectDownload) {
-//                 res.setHeader('Content-disposition', `attachment; filename=download.${input.type}`);
-//                 res.download(destination, input.outputFileName);
-//             }
-//         });
-//         let port = 8000;
-//         app.listen(port, () => {
-//             console.log(`lisstening on port ${port}`);
-//         });
-//         return null;
-//     }
+    public async downloadFile(input: IBody): Promise<string> {
+        let destination = this.url;
+        app.get('/download', (req: any, res: any) => {
 
-//     public async uploadFile(input: IBody): Promise<string> {
+            res.setHeader('Content-disposition', `attachment; filename=download.${input.type}`);
+            res.download(destination, input.outputFileName);
 
-//         app.post('/', async (request: http.ServerRequest, response: http.ServerResponse) => {
-//             console.log(await request.headers);      // your JSON
-//             console.log('\n');
+        });
+        let port = 8000;
+        app.listen(port, () => {
+            console.log(`lisstening on port ${port}`);
+        });
+        return null;
+    }
 
-//             let chemin = this.url;
-//             let pageHeaders = request.headers;
+    public async uploadFile(input: IBody): Promise<string> {
 
-//             if (typeof (input.modeleRef) === 'string') {
-//                 let buffer = await read(chemin);
-//                 let contenu = buffer.toString();
-//                 let body = input.modeleRef.toString();
+        app.post('/', async (request: http.ServerRequest, response: http.ServerResponse) => {
+            console.log(await request.headers);      // your JSON
+            console.log('\n');
 
-//                 response.writeHead(200, {
-//                     'Content-Length': buffer.length,
-//                     'Content-Type': 'text/plain',
-//                     'host': 'localhost:8000',
-//                     'connection': 'keep-alive',
-//                 });
-//                 response.write(contenu);
-//                 console.log(contenu);
+            let chemin = this.url;
+            let pageHeaders = request.headers;
 
-//             } else {
-//                 throw new Error ('ERROR while posting!');
-//             }
-//             response.end();
-//         });
+            if (typeof (input.modeleRef) === 'string') {
+                let buffer = await read(chemin);
+                let contenu = buffer.toString();
+                let body = input.modeleRef.toString();
 
-//         let port = 8000;
-//         app.listen(port, () => {
-//             console.log(`listening on port ${port}`);
-//         });
-//         return null;
-//     }
-// }
+                response.writeHead(200, {
+                    'Content-Length': buffer.length,
+                    'Content-Type': 'text/plain',
+                    'host': 'localhost:8000',
+                    'connection': 'keep-alive',
+                });
+                response.write(contenu);
+                console.log(contenu);
+
+            } else {
+                throw new Error('ERROR while posting!');
+            }
+            response.end();
+        });
+
+        let port = 8000;
+        app.listen(port, () => {
+            console.log(`listening on port ${port}`);
+        });
+        return null;
+    }
+}

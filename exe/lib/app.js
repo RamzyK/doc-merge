@@ -9,6 +9,10 @@ const echo_plugin_1 = require("./plugins/echo-plugin");
 const index_1 = require("./index");
 const fs = require("fs");
 const util = require("util");
+const path = require("path");
+const error_handler_middleware_1 = require("./errors/error-handler-middleware");
+const ext_error_1 = require("./errors/ext-error");
+let app = require('express');
 const exist = util.promisify(fs.exists);
 class App {
     constructor(_options) {
@@ -16,7 +20,8 @@ class App {
         this.express = express();
         this.express.use(bodyParser.json({ type: ['application/json', 'application/json-patch+json'] }));
         this.express.use('/merge', async_handler_1.asyncMiddleware(this.mergeHandler.bind(this)));
-        this.express.use('/download', async_handler_1.asyncMiddleware(this.downloadHandler.bind(this)));
+        this.express.get('/download/:file', async_handler_1.asyncMiddleware(this.downloadHandler.bind(this)));
+        this.express.use(new error_handler_middleware_1.ErrorHandler().handler);
         this._generator = new generator_1.Generator(_options.tmpFolder);
         this._generator.registerPlugin('echo', new echo_plugin_1.EchoPlugin());
         this._generator.registerPlugin('docx', new index_1.DocGenerator());
@@ -52,29 +57,21 @@ class App {
             });
         });
     }
+    async downloadHandler(request, response, next) {
+        const file = request.params.file;
+        const pathToFile = path.join(this._options.tmpFolder, file);
+        let resp;
+        if (!await exist(pathToFile)) {
+            throw new ext_error_1.ExtError(404, `Le fichier ${pathToFile} n'existe pas`);
+        }
+        response.download(pathToFile, file);
+    }
     async mergeHandler(request, response, next) {
         const body = request.body;
         if (!body || !generator_1.isIBody(body)) {
             throw new Error('Bad request');
         }
         await this._generator.docMerge(body, response);
-    }
-    async downloadHandler(request, response, next) {
-        let app = require('express');
-        let pathToFile;
-        app.get('/download/:fileName', async (rqst, resp, nxt) => {
-            pathToFile = rqst.params.fileName;
-            if (!exist(pathToFile)) {
-                throw new Error(`Le fichier ${pathToFile} n'existe pas`);
-            }
-            let downloadedFile = {
-                outputFileName: pathToFile,
-                contentType: 'docx',
-            };
-            resp.download(pathToFile);
-            return await downloadedFile;
-        });
-        return pathToFile;
     }
 }
 exports.App = App;

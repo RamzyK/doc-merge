@@ -54,22 +54,6 @@ export class FilePlugin implements IPluginOld {
         return iplugin;
     }
 
-    // // tslint:disable-next-line:max-line-length
-    // private async handlerDocxDownload(
-    //    array: string[], plugin: IPluginResult, download: any, input: gn.IBody): Promise<void> {
-    //     let autoDownload = input.downloadType.isDirectDownload;
-    //     if (array[0] !== 'error') {
-    //         let pathTodocx = array[1];         // Path to the generated docx file
-    //         download = new DownloadHandler(pathTodocx);
-    //         if (autoDownload === true) {
-    //             await download.downloadFile(input);
-    //         } else if (input.downloadType.dType === gn.OutputType.upload) {
-    //             await download.uploadFile(input);
-    //         }
-    //     } else {
-    //         throw new Error('Error generating docx file!');
-    //     }
-    // }
     private async docxGenerator(data: string | IFile, input: gn.IBody, fileURL: string): Promise<string> {
         const read = util.promisify(fs.readFile);
         const write = util.promisify(fs.writeFile);

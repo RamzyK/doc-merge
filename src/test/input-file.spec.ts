@@ -122,48 +122,48 @@ async function getText(fileName: string): Promise<string> {
 //         }
 
 //     });
+// // });
+
+// describe('Generate a docx document', function () {
+//     it('should generate a .docx file', async function () {
+//         const docxPath = 'C:/Users/raker/Desktop/docxGenerator';            // Chemin vers le dossier de depôt
+//         const fileData: dm.IFile = {
+//             url: 'file://C:/Users/raker/Desktop/Document.docx',             // Chemin vers le document model
+//             headers: {
+//                 'Allow': 'POST',
+//                 'ContentLength': 0,
+//                 'Content-Type': 'text/html; charset=UTF-8',
+//             },
+//             verb: 'GET',
+//         };
+
+//         const options = {
+//             last_name: 'Kermad',
+//             first_name: 'Ramzy',
+//             phone: '06-06-06-06-06',
+//             description: 'Stage dev Javascript/ Typescript',
+//         };
+
+//         const docOption: dm.IBody = {
+//             type: 'txt',
+//             data: options,
+//             modeleRef: ' ',
+//             outputFileName: 'newDoc.txt',
+//             outputPath: docxPath,
+//             outputType: dm.OutputType.download,
+//         };
+
+//         const generator = new dm.Generator('c:\\tmp');
+//         // generator.registerPlugin('docx', new dm.FilePlugin());
+//         // generator.registerPlugin('txt', new dm.FilePlugin());
+
+//         if (await asyncExists(docxPath)) {
+//             await deleteDirectoryContent(docxPath);
+//         } else {
+//             await asyncMkDir(docxPath);
+//         }
+
+//         // const generated = await generator.docMerge(docOption);
+//         // expect(generated.state).equals('done');
+//     });
 // });
-
-describe('Generate a docx document', function () {
-    it('should generate a .docx file', async function () {
-        const docxPath = 'C:/Users/raker/Desktop/docxGenerator';            // Chemin vers le dossier de depôt
-        const fileData: dm.IFile = {
-            url: 'file://C:/Users/raker/Desktop/Document.docx',             // Chemin vers le document model
-            headers: {
-                'Allow': 'POST',
-                'ContentLength': 0,
-                'Content-Type': 'text/html; charset=UTF-8',
-            },
-            verb: 'GET',
-        };
-
-        const options = {
-            last_name: 'Kermad',
-            first_name: 'Ramzy',
-            phone: '06-06-06-06-06',
-            description: 'Stage dev Javascript/ Typescript',
-        };
-
-        const docOption: dm.IBody = {
-            type: 'txt',
-            data: options,
-            modeleRef: ' ',
-            outputFileName: 'newDoc.txt',
-            outputPath: docxPath,
-            outputType: dm.OutputType.download,
-        };
-
-        const generator = new dm.Generator('c:\\tmp');
-        // generator.registerPlugin('docx', new dm.FilePlugin());
-        // generator.registerPlugin('txt', new dm.FilePlugin());
-
-        if (await asyncExists(docxPath)) {
-            await deleteDirectoryContent(docxPath);
-        } else {
-            await asyncMkDir(docxPath);
-        }
-
-        // const generated = await generator.docMerge(docOption);
-        // expect(generated.state).equals('done');
-    });
-});

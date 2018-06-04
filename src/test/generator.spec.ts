@@ -73,6 +73,46 @@ describe('Generator', function () {
             await app.stop();
         }
     });
+    it('download file not found', async function () {
+        const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
+        // TODO creer le repertoire (et le vider)
+        if (await !exists(tmpFolder)) {
+            await asyncMkDir(tmpFolder);
+        } else {
+            await deleteDirectoryContent(tmpFolder);
+        }
+
+        const app = new dm.App({
+            port: 0,
+            tmpFolder,
+        });
+
+        const server = await app.start();
+        try {
+            const port = server.address().port;
+
+            const testUrl = `http://localhost:${port}/download/nexistepas`;
+            const requestResponse = await new Promise<void>((resolve, reject) => {
+                let r = request.get(testUrl,
+                    {
+                    });
+                r.on('error', (error: any) => {
+                    reject(error);
+                });
+                r.on('response', function (response) {
+                    if (response.statusCode >= 400) {
+                        reject(response.statusCode);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+        } catch (e) {
+            assert(e < 500);
+        } finally {
+            await app.stop();
+        }
+    });
     it('simple download', async function () {
         const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
         // TODO creer le repertoire (et le vider)
