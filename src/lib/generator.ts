@@ -50,6 +50,7 @@ export class Generator {
                 await this.sendFile(response, generateOutput);
                 break;
             case OutputType.url:
+                await this.sendUrl(response, generateOutput);
                 // return file url
                 break;
             case OutputType.upload:
@@ -74,7 +75,7 @@ export class Generator {
             outputFileName,
         };
 
-        return await plugIn.generate(pluginInput);  // TODO lundi: Créer class implement IPlugin et ré-implémenter generate dessus
+        return await plugIn.generate(pluginInput);
 
     }
     public async registerPlugin(type: string, plugin: IPlugin): Promise<void> {
@@ -82,6 +83,14 @@ export class Generator {
     }
     private async sendFile(response: express.Response, pluginOutput: IPluginOutput) {
         response.download(pluginOutput.outputFileName);
+    }
+
+    private async sendUrl(response: express.Response, pluginOutput: IPluginOutput) {
+        let repUrl = pluginOutput.outputFileName;
+        let resp: any = {
+            repUrl,
+        };
+        response.json(resp);
     }
 
 }

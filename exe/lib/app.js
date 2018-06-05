@@ -54,20 +54,23 @@ class App {
             });
         });
     }
+    async downloadHandler(request, response, next) {
+        const file = request.params.file;
+        const pathToFile = path.join(this._options.tmpFolder, 'src\\test\\docx-generator-data', file);
+        let resp;
+        if (!exist(pathToFile)) {
+            throw new Error(`Le fichier ${pathToFile} n'existe pas`);
+        }
+        response.download(pathToFile, file);
+        resp = response.statusCode;
+        return resp;
+    }
     async mergeHandler(request, response, next) {
         const body = request.body;
         if (!body || !generator_1.isIBody(body)) {
             throw new Error('Bad request');
         }
         await this._generator.docMerge(body, response);
-    }
-    async downloadHandler(request, response, next) {
-        const file = request.params.file;
-        const pathToFile = path.join(this._options.tmpFolder, 'src\\test\\docx-generator-data', file);
-        if (!exist(pathToFile)) {
-            throw new Error(`Le fichier ${pathToFile} n'existe pas`);
-        }
-        response.download(pathToFile, file);
     }
 }
 exports.App = App;

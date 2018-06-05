@@ -25,6 +25,7 @@ class Generator {
                 await this.sendFile(response, generateOutput);
                 break;
             case OutputType.url:
+                await this.sendUrl(response, generateOutput);
                 break;
             case OutputType.upload:
                 break;
@@ -52,6 +53,13 @@ class Generator {
     }
     async sendFile(response, pluginOutput) {
         response.download(pluginOutput.outputFileName);
+    }
+    async sendUrl(response, pluginOutput) {
+        let repUrl = pluginOutput.outputFileName;
+        let resp = {
+            repUrl,
+        };
+        response.json(resp);
     }
 }
 exports.Generator = Generator;
