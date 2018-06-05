@@ -10,6 +10,8 @@ const index_1 = require("./index");
 const fs = require("fs");
 const util = require("util");
 const path = require("path");
+const error_handler_middleware_1 = require("./errors/error-handler-middleware");
+const ext_error_1 = require("./errors/ext-error");
 let app = require('express');
 const exist = util.promisify(fs.exists);
 class App {
@@ -19,6 +21,7 @@ class App {
         this.express.use(bodyParser.json({ type: ['application/json', 'application/json-patch+json'] }));
         this.express.use('/merge', async_handler_1.asyncMiddleware(this.mergeHandler.bind(this)));
         this.express.get('/download/:file', async_handler_1.asyncMiddleware(this.downloadHandler.bind(this)));
+        this.express.use(new error_handler_middleware_1.ErrorHandler().handler);
         this._generator = new generator_1.Generator(_options.tmpFolder);
         this._generator.registerPlugin('echo', new echo_plugin_1.EchoPlugin());
         this._generator.registerPlugin('docx', new index_1.DocGenerator());
@@ -56,14 +59,12 @@ class App {
     }
     async downloadHandler(request, response, next) {
         const file = request.params.file;
-        const pathToFile = path.join(this._options.tmpFolder, 'src\\test\\docx-generator-data', file);
+        const pathToFile = path.join(this._options.tmpFolder, file);
         let resp;
-        if (!exist(pathToFile)) {
-            throw new Error(`Le fichier ${pathToFile} n'existe pas`);
+        if (!await exist(pathToFile)) {
+            throw new ext_error_1.ExtError(404, `Le fichier ${pathToFile} n'existe pas`);
         }
         response.download(pathToFile, file);
-        resp = response.statusCode;
-        return resp;
     }
     async mergeHandler(request, response, next) {
         const body = request.body;

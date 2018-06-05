@@ -10,6 +10,8 @@ import * as util from 'util';
 import * as path from 'path';
 
 import { IPluginOutput } from './generateur/index';
+import { ErrorHandler } from './errors/error-handler-middleware';
+import { ExtError } from './errors/ext-error';
 
 // tslint:disable:max-line-length
 // tslint:disable:no-var-requires
@@ -39,6 +41,7 @@ export class App {
         this.express.use(bodyParser.json({ type: ['application/json', 'application/json-patch+json'] }));
         this.express.use('/merge', asyncMiddleware(this.mergeHandler.bind(this)));
         this.express.get('/download/:file', asyncMiddleware(this.downloadHandler.bind(this)));
+        this.express.use(new ErrorHandler().handler);
         this._generator = new Generator(_options.tmpFolder);
         this._generator.registerPlugin('echo', new EchoPlugin());
         this._generator.registerPlugin('docx', new DocGenerator());
@@ -70,17 +73,15 @@ export class App {
         });
     }
 
-    public async downloadHandler(request: express.Request, response: express.Response, next: express.NextFunction): Promise<number> {
+    public async downloadHandler(request: express.Request, response: express.Response, next: express.NextFunction): Promise<void> {
         const file: string = request.params.file;
-        const pathToFile = path.join(this._options.tmpFolder, 'src\\test\\docx-generator-data', file);
+        const pathToFile = path.join(this._options.tmpFolder, file);
         let resp: number;
-        if (!exist(pathToFile)) {
-            throw new Error(`Le fichier ${pathToFile} n'existe pas`);
+        if (! await exist(pathToFile)) {
+            throw new ExtError(404, `Le fichier ${pathToFile} n'existe pas`);
         }
         response.download(pathToFile, file);
-        resp = response.statusCode;
-        return resp;
-    }
+     }
 
     private async mergeHandler(request: express.Request, response: express.Response, next: express.NextFunction): Promise<void> {
         const body: any = request.body;

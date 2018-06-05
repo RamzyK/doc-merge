@@ -18,6 +18,6 @@ export declare class App {
     constructor(_options: IAppOptions);
     start(): Promise<http.Server>;
     stop(): Promise<void>;
-    downloadHandler(request: express.Request, response: express.Response, next: express.NextFunction): Promise<number>;
+    downloadHandler(request: express.Request, response: express.Response, next: express.NextFunction): Promise<void>;
     private mergeHandler(request, response, next);
 }

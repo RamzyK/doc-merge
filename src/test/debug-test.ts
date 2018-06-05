@@ -4,7 +4,7 @@ import 'mocha';
 // to test only test 'y' in suite 'x':
 // const testToDebug = 'x y';
 // ex:
-const testToDebug: string = 'Generator simple output';
+const testToDebug: string = 'file not found';
 
 beforeEach(function () {
     // tslint:disable-next-line:no-this-assignment
