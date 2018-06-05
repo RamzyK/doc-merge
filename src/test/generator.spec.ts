@@ -31,7 +31,7 @@ describe('Generator', function () {
         const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
 
         // TODO creer le repertoire (et le vider)
-        if (await !exists(tmpFolder)) {
+        if (! await exists(tmpFolder)) {
             await asyncMkDir(tmpFolder);
         } else {
             await deleteDirectoryContent(tmpFolder);
