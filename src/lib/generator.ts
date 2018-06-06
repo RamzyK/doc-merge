@@ -40,7 +40,7 @@ export class Generator {
         this.docExtention = new Map<string, IPlugin>();
     }
 
-    public async docMerge(input: IBody, response: express.Response): Promise<void> {
+    public async docMerge(input: IBody, request: express.Request, response: express.Response): Promise<void> {
         const generateOutput = await this.generate(input);
 
         // formater le response
@@ -50,8 +50,13 @@ export class Generator {
                 await this.sendFile(response, generateOutput);
                 break;
             case OutputType.url:
+                let requestUrl = request.url;
+                let before = requestUrl.split('/merge')[0];
+                let after = requestUrl.split('/merge')[1];
+                let urlToSend = before + '/download' + after;
+                generateOutput.outputFileName = urlToSend;
                 await this.sendUrl(response, generateOutput);
-                // return file url
+
                 break;
             case OutputType.upload:
                 // upload file
@@ -68,7 +73,9 @@ export class Generator {
         // Transformer input => IPluginInput
         const inputFile = new InputFile({ tmpFolder: this._tmpFolder });
         const modelFileName = await inputFile.getFile(input.modeleRef);
+        console.log('chemin vers le fichier: ' + modelFileName);
         const outputFileName = path.join(this._tmpFolder, uuid.v4());
+        console.log('output file name: ' + outputFileName);
         const pluginInput: IPluginInput = {
             modelFileName,
             data: input.data,
@@ -86,7 +93,12 @@ export class Generator {
     }
 
     private async sendUrl(response: express.Response, pluginOutput: IPluginOutput) {
-        let repUrl = pluginOutput.outputFileName;
+        let outputFilename = pluginOutput.outputFileName;
+        let fileName = outputFilename.split('/', outputFilename.lastIndexOf('/'))[1];
+        let type = pluginOutput.contentType;
+
+        let repUrl = path.join('http://localhost:8555/', fileName, type);
+        console.log(pluginOutput.outputFileName);
         let resp: any = {
             repUrl,
         };

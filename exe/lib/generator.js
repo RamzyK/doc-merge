@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const input_file_1 = require("./input-ref/input-file");
 const path = require("path");
-const uuid = require("uuid");
 var OutputType;
 (function (OutputType) {
     OutputType[OutputType["download"] = 0] = "download";
@@ -40,7 +39,9 @@ class Generator {
         }
         const inputFile = new input_file_1.InputFile({ tmpFolder: this._tmpFolder });
         const modelFileName = await inputFile.getFile(input.modeleRef);
-        const outputFileName = path.join(this._tmpFolder, uuid.v4());
+        console.log('chemin vers le fichier: ' + modelFileName);
+        const outputFileName = path.join(this._tmpFolder);
+        console.log('output file name: ' + outputFileName);
         const pluginInput = {
             modelFileName,
             data: input.data,
@@ -55,7 +56,8 @@ class Generator {
         response.download(pluginOutput.outputFileName);
     }
     async sendUrl(response, pluginOutput) {
-        let repUrl = pluginOutput.outputFileName;
+        let repUrl = path.join('http://localhost:8555/download/', pluginOutput.outputFileName);
+        console.log(pluginOutput.outputFileName);
         let resp = {
             repUrl,
         };

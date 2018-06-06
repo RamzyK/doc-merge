@@ -38,7 +38,6 @@ describe('Generator', function () {
         }
         // TODO file:// + chemin vers model.docx;
         const modelUrl = 'file:\\\\' + path.join(__dirname, '..\\..\\src\\test\\docx-generator-data', 'model.docx');
-
         const app = new dm.App({
             port: 0,
             tmpFolder,
@@ -115,6 +114,7 @@ describe('Generator', function () {
     });
     it('simple download', async function () {
         const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
+
         // TODO creer le repertoire (et le vider)
         if (await !exists(tmpFolder)) {
             await asyncMkDir(tmpFolder);
@@ -151,4 +151,43 @@ describe('Generator', function () {
         }
     });
 
+    it('should send url', async function () {
+        const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
+
+        if (await !exists(tmpFolder)) {
+            await asyncMkDir(tmpFolder);
+        } else {
+            await deleteDirectoryContent(tmpFolder);
+        }
+        let filename = 'testfile';
+
+        fs.writeFileSync(path.join(tmpFolder, filename), 'Send url response');
+        const app = new dm.App({
+            port: 0,
+            tmpFolder,
+        });
+        const server = await app.start();
+
+        try {
+            const port = server.address().port;
+
+            const testUrl = `http://localhost:${port}/merge/${filename}`;
+            const outputFileName = path.join(tmpFolder, 'outputTestFile');
+            const requestResponse = await new Promise<void>((resolve, reject) => {
+                let r = request.get(testUrl,
+                    {
+                    });
+                r.on('error', (error: any) => {
+                    reject(error);
+                });
+                let output = fs.createWriteStream(outputFileName);
+                r.pipe(output);
+                output.on('finish', () => resolve());
+            });
+            assert(fs.existsSync(outputFileName));
+
+        } finally {
+            await app.stop();
+        }
+    });
 });
