@@ -10,7 +10,7 @@ class DocGenerator {
     }
     async generate(input) {
         const output = {
-            outputFileName: input.outputFileName,
+            outputFileName: input.outputFileName + '.docx',
             contentType: 'docx',
         };
         await this.generateDocx(input.modelFileName, input.data, output.outputFileName);

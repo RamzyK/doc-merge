@@ -3,6 +3,7 @@ import { IPluginInput, IPlugin, IPluginOutput } from './generateur/index';
 import * as path from 'path';
 import * as express from 'express';
 import * as uuid from 'uuid';
+import {Url} from 'url';
 // tslint:disable:max-line-length
 // tslint:disable-next-line:no-empty-interface
 export interface IPluginResult {
@@ -50,17 +51,10 @@ export class Generator {
                 await this.sendFile(response, generateOutput);
                 break;
             case OutputType.url:
-                let requestUrl = request.url;
-                console.log('requestUrl: ' + requestUrl);
-                let a = requestUrl.split('/merge');
-                let before = a[0];
-                console.log('before: ' + before);
-                let after = a[1];
-                console.log('after: ' + after);
-                let urlToSend = before + '/download' + after;
-                generateOutput.outputFileName = urlToSend;
-                console.log('urlToend: ' + urlToSend);
-                await this.sendUrl(response, generateOutput);
+                let requestUrl = request.baseUrl;
+                let fileName = path.basename(generateOutput.outputFileName);
+                const url = requestUrl + `/../download/${fileName}`;
+                await this.sendUrl(response, url.toString());
                 break;
             case OutputType.upload:
                 // upload file
@@ -94,15 +88,9 @@ export class Generator {
         response.download(pluginOutput.outputFileName);
     }
 
-    private async sendUrl(response: express.Response, pluginOutput: IPluginOutput) {
-        let outputFilename = pluginOutput.outputFileName;
-        let fileName = outputFilename.split('/', outputFilename.lastIndexOf('/'))[1];
-        let type = pluginOutput.contentType;
-
-        let repUrl = path.join('http://', '', fileName, type);
-        console.log(pluginOutput.outputFileName);
+    private async sendUrl(response: express.Response, url: string) {
         let resp: any = {
-            repUrl,
+            url,
         };
         response.json(resp);
     }

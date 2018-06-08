@@ -33,5 +33,5 @@ export declare class Generator {
     generate(input: IBody): Promise<IPluginOutput>;
     registerPlugin(type: string, plugin: IPlugin): Promise<void>;
     private sendFile(response, pluginOutput);
-    private sendUrl(response, pluginOutput);
+    private sendUrl(response, url);
 }

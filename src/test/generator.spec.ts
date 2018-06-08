@@ -9,6 +9,8 @@ import { promisify } from 'util';
 import * as fs from 'fs';
 
 import * as request from 'request';
+import { ExtError } from '../lib/errors/ext-error';
+import { URL } from 'url';
 const assert = chai.assert;
 
 const exists = promisify(fs.exists);
@@ -174,21 +176,29 @@ describe('Generator', function () {
             };
 
             const testUrl = `http://localhost:${port}/merge`;
-            const requestResponse = await new Promise<void>((resolve, reject) => {
+            const responseUrl: any = await new Promise<void>((resolve, reject) => {
                 let r = request.post(testUrl,
                     {
                         body: JSON.stringify(body),
                         headers: {
                             'Content-Type': 'application/json',
                         },
+                    }, (error, response, responsseBody) => {
+                        if (error) {
+                            reject(error);
+                        } else if (response.statusCode >= 400) {
+                            reject(new ExtError(response.statusCode, responsseBody));
+                        } else {
+                            const { url } = JSON.parse(responsseBody);
+                            resolve(url);
+                        }
                     });
                 r.on('error', (error: any) => {
                     reject(error);
                 });
-                let output = fs.createWriteStream(path.join(tmpFolder, 'output.docx'));
-                r.pipe(output);
-                output.on('finish', () => resolve());
             });
+            const downloadUrl = `http://localhost:${port}` + responseUrl;
+            assert(downloadUrl.toString().includes('download'));
         } finally {
             await app.stop();
         }

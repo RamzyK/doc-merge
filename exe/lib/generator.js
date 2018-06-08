@@ -25,17 +25,10 @@ class Generator {
                 await this.sendFile(response, generateOutput);
                 break;
             case OutputType.url:
-                let requestUrl = request.url;
-                console.log('requestUrl: ' + requestUrl);
-                let a = requestUrl.split('/merge');
-                let before = a[0];
-                console.log('before: ' + before);
-                let after = a[1];
-                console.log('after: ' + after);
-                let urlToSend = before + '/download' + after;
-                generateOutput.outputFileName = urlToSend;
-                console.log('urlToend: ' + urlToSend);
-                await this.sendUrl(response, generateOutput);
+                let requestUrl = request.baseUrl;
+                let fileName = path.basename(generateOutput.outputFileName);
+                const url = requestUrl + `/../download/${fileName}`;
+                await this.sendUrl(response, url.toString());
                 break;
             case OutputType.upload:
                 break;
@@ -64,14 +57,9 @@ class Generator {
     async sendFile(response, pluginOutput) {
         response.download(pluginOutput.outputFileName);
     }
-    async sendUrl(response, pluginOutput) {
-        let outputFilename = pluginOutput.outputFileName;
-        let fileName = outputFilename.split('/', outputFilename.lastIndexOf('/'))[1];
-        let type = pluginOutput.contentType;
-        let repUrl = path.join('http://localhost:8555/', fileName, type);
-        console.log(pluginOutput.outputFileName);
+    async sendUrl(response, url) {
         let resp = {
-            repUrl,
+            url,
         };
         response.json(resp);
     }

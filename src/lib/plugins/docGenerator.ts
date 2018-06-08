@@ -17,7 +17,7 @@ export class DocGenerator implements gn.IPlugin {
     }
     public async  generate(input: gn.IPluginInput): Promise<gn.IPluginOutput> {
         const output: gn.IPluginOutput = {
-            outputFileName: input.outputFileName,
+            outputFileName: input.outputFileName + '.docx',
             contentType: 'docx',
         };
 
