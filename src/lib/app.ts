@@ -88,6 +88,7 @@ export class App {
         if (!body || !isIBody(body)) {
             throw new Error('Bad request');
         }
-        await this._generator.docMerge(body, response);
+        await this._generator.docMerge(body, request, response);
     }
+
 }

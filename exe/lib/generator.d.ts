@@ -29,7 +29,7 @@ export declare class Generator {
     private readonly _tmpFolder;
     private readonly docExtention;
     constructor(tmpFolder: string);
-    docMerge(input: IBody, response: express.Response): Promise<void>;
+    docMerge(input: IBody, request: express.Request, response: express.Response): Promise<void>;
     generate(input: IBody): Promise<IPluginOutput>;
     registerPlugin(type: string, plugin: IPlugin): Promise<void>;
     private sendFile(response, pluginOutput);

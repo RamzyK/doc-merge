@@ -4,7 +4,7 @@ import 'mocha';
 // to test only test 'y' in suite 'x':
 // const testToDebug = 'x y';
 // ex:
-const testToDebug: string = 'simple output';
+const testToDebug: string = 'should send the url to client';
 
 beforeEach(function () {
     // tslint:disable-next-line:no-this-assignment

@@ -51,12 +51,16 @@ export class Generator {
                 break;
             case OutputType.url:
                 let requestUrl = request.url;
-                let before = requestUrl.split('/merge')[0];
-                let after = requestUrl.split('/merge')[1];
+                console.log('requestUrl: ' + requestUrl);
+                let a = requestUrl.split('/merge');
+                let before = a[0];
+                console.log('before: ' + before);
+                let after = a[1];
+                console.log('after: ' + after);
                 let urlToSend = before + '/download' + after;
                 generateOutput.outputFileName = urlToSend;
+                console.log('urlToend: ' + urlToSend);
                 await this.sendUrl(response, generateOutput);
-
                 break;
             case OutputType.upload:
                 // upload file
@@ -73,9 +77,7 @@ export class Generator {
         // Transformer input => IPluginInput
         const inputFile = new InputFile({ tmpFolder: this._tmpFolder });
         const modelFileName = await inputFile.getFile(input.modeleRef);
-        console.log('chemin vers le fichier: ' + modelFileName);
         const outputFileName = path.join(this._tmpFolder, uuid.v4());
-        console.log('output file name: ' + outputFileName);
         const pluginInput: IPluginInput = {
             modelFileName,
             data: input.data,
@@ -97,7 +99,7 @@ export class Generator {
         let fileName = outputFilename.split('/', outputFilename.lastIndexOf('/'))[1];
         let type = pluginOutput.contentType;
 
-        let repUrl = path.join('http://localhost:8555/', fileName, type);
+        let repUrl = path.join('http://', '', fileName, type);
         console.log(pluginOutput.outputFileName);
         let resp: any = {
             repUrl,

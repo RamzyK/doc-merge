@@ -71,7 +71,7 @@ class App {
         if (!body || !generator_1.isIBody(body)) {
             throw new Error('Bad request');
         }
-        await this._generator.docMerge(body, response);
+        await this._generator.docMerge(body, request, response);
     }
 }
 exports.App = App;

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const input_file_1 = require("./input-ref/input-file");
 const path = require("path");
+const uuid = require("uuid");
 var OutputType;
 (function (OutputType) {
     OutputType[OutputType["download"] = 0] = "download";
@@ -17,13 +18,23 @@ class Generator {
         this._tmpFolder = tmpFolder;
         this.docExtention = new Map();
     }
-    async docMerge(input, response) {
+    async docMerge(input, request, response) {
         const generateOutput = await this.generate(input);
         switch (input.outputType) {
             case OutputType.download:
                 await this.sendFile(response, generateOutput);
                 break;
             case OutputType.url:
+                let requestUrl = request.url;
+                console.log('requestUrl: ' + requestUrl);
+                let a = requestUrl.split('/merge');
+                let before = a[0];
+                console.log('before: ' + before);
+                let after = a[1];
+                console.log('after: ' + after);
+                let urlToSend = before + '/download' + after;
+                generateOutput.outputFileName = urlToSend;
+                console.log('urlToend: ' + urlToSend);
                 await this.sendUrl(response, generateOutput);
                 break;
             case OutputType.upload:
@@ -39,9 +50,7 @@ class Generator {
         }
         const inputFile = new input_file_1.InputFile({ tmpFolder: this._tmpFolder });
         const modelFileName = await inputFile.getFile(input.modeleRef);
-        console.log('chemin vers le fichier: ' + modelFileName);
-        const outputFileName = path.join(this._tmpFolder);
-        console.log('output file name: ' + outputFileName);
+        const outputFileName = path.join(this._tmpFolder, uuid.v4());
         const pluginInput = {
             modelFileName,
             data: input.data,
@@ -56,7 +65,10 @@ class Generator {
         response.download(pluginOutput.outputFileName);
     }
     async sendUrl(response, pluginOutput) {
-        let repUrl = path.join('http://localhost:8555/download/', pluginOutput.outputFileName);
+        let outputFilename = pluginOutput.outputFileName;
+        let fileName = outputFilename.split('/', outputFilename.lastIndexOf('/'))[1];
+        let type = pluginOutput.contentType;
+        let repUrl = path.join('http://localhost:8555/', fileName, type);
         console.log(pluginOutput.outputFileName);
         let resp = {
             repUrl,
