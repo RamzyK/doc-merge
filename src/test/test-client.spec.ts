@@ -41,41 +41,24 @@ describe('Client test', function () {
             tmpFolder,
         });
         const server = await app.start();
-        const port = server.address().port;
-        const testUrl = `http://localhost:${port}/merge`;
+        try {
+            const port = server.address().port;
+            const serviceUrl = `http://localhost:${port}`;
 
-        let body: dm.IBody = {
-            data: {},
-            modeleRef: { url: testUrl },
-            type: 'docx',
-            outputType: dm.OutputType.url,
-        };
+            const modelFileName = path.join(__dirname, '../../src/test/docx-generator-data/model.docx');
 
-        const responseUrl: any = await new Promise<void>((resolve, reject) => {
-            let r = request.post(testUrl,
-                {
-                    body: JSON.stringify(body),
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }, (error, response, responsseBody) => {
-                    if (error) {
-                        reject(error);
-                    } else if (response.statusCode >= 400) {
-                        reject(new ExtError(response.statusCode, responsseBody));
-                    } else {
-                        const { url } = JSON.parse(responsseBody);
-                        resolve(url);
-                    }
-                });
-            r.on('error', (error: any) => {
-                reject(error);
-            });
-        });
+            let body: dm.IBody = {
+                data: {},
+                modeleRef: { url: 'file://' + modelFileName },
+                type: 'docx',
+                outputType: dm.OutputType.url,
+            };
 
-        let client = new dm.Client(testUrl);
-        let clientResponse = client.getUrl(body.type, body.data, body.modeleRef);
-
-        expect(clientResponse).eql(responseUrl);
+            let client = new dm.Client(serviceUrl);
+            let clientResponse = await client.getUrl(body.type, body.data, body.modeleRef);
+            assert(clientResponse.startsWith(serviceUrl));
+        } finally {
+            // app.stop();
+        }
     });
 });

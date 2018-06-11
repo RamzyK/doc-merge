@@ -15,9 +15,9 @@ export class Client {
             type,
             outputType: OutputType.url,
         };
-        const testUrl = this.urlService;
+        const mergeUrl = this.urlService + '/merge';
         const responseUrl: any = await new Promise<void>((resolve, reject) => {
-            let r = request.post(testUrl,
+            let r = request.post(mergeUrl,
                 {
                     body: JSON.stringify(body),
                     headers: {
@@ -38,6 +38,6 @@ export class Client {
             });
         });
 
-        return responseUrl;
+        return this.urlService + responseUrl;
     }
 }
