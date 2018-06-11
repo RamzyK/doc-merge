@@ -29,129 +29,129 @@ async function deleteDirectoryContent(dirPath: string) {
 }
 
 describe('Generator', function () {
-    // it('simple output', async function () {
-    //     const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
+    it('simple output', async function () {
+        const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
 
-    //     // TODO creer le repertoire (et le vider)
-    //     if (! await exists(tmpFolder)) {
-    //         await asyncMkDir(tmpFolder);
-    //     } else {
-    //         await deleteDirectoryContent(tmpFolder);
-    //     }
-    //     // TODO file:// + chemin vers model.docx;
-    //     const modelUrl = 'file:\\\\' + path.join(__dirname, '..\\..\\src\\test\\docx-generator-data', 'model.docx');
-    //     const app = new dm.App({
-    //         port: 0,
-    //         tmpFolder,
-    //     });
-    //     const server = await app.start();
-    //     try {
-    //         const port = server.address().port;
-    //         const body: dm.IBody = {
-    //             data: {},
-    //             modeleRef: { url: modelUrl },
-    //             type: 'docx',
-    //             outputType: dm.OutputType.download,
-    //         };
+        // TODO creer le repertoire (et le vider)
+        if (! await exists(tmpFolder)) {
+            await asyncMkDir(tmpFolder);
+        } else {
+            await deleteDirectoryContent(tmpFolder);
+        }
+        // TODO file:// + chemin vers model.docx;
+        const modelUrl = 'file:\\\\' + path.join(__dirname, '..\\..\\src\\test\\docx-generator-data', 'model.docx');
+        const app = new dm.App({
+            port: 0,
+            tmpFolder,
+        });
+        const server = await app.start();
+        try {
+            const port = server.address().port;
+            const body: dm.IBody = {
+                data: {},
+                modeleRef: { url: modelUrl },
+                type: 'docx',
+                outputType: dm.OutputType.download,
+            };
 
-    //         const testUrl = `http://localhost:${port}/merge`;
-    //         const requestResponse = await new Promise<void>((resolve, reject) => {
-    //             let r = request.post(testUrl,
-    //                 {
-    //                     body: JSON.stringify(body),
-    //                     headers: {
-    //                         'Content-Type': 'application/json',
-    //                     },
-    //                 });
-    //             r.on('error', (error: any) => {
-    //                 reject(error);
-    //             });
-    //             let output = fs.createWriteStream(path.join(tmpFolder, 'output.docx'));
-    //             r.pipe(output);
-    //             output.on('finish', () => resolve());
-    //         });
-    //     } finally {
-    //         await app.stop();
-    //     }
-    // });
-    // it('download file not found', async function () {
-    //     const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
-    //     // TODO creer le repertoire (et le vider)
-    //     if (await !exists(tmpFolder)) {
-    //         await asyncMkDir(tmpFolder);
-    //     } else {
-    //         await deleteDirectoryContent(tmpFolder);
-    //     }
+            const testUrl = `http://localhost:${port}/merge`;
+            const requestResponse = await new Promise<void>((resolve, reject) => {
+                let r = request.post(testUrl,
+                    {
+                        body: JSON.stringify(body),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                r.on('error', (error: any) => {
+                    reject(error);
+                });
+                let output = fs.createWriteStream(path.join(tmpFolder, 'output.docx'));
+                r.pipe(output);
+                output.on('finish', () => resolve());
+            });
+        } finally {
+            await app.stop();
+        }
+    });
+    it('download file not found', async function () {
+        const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
+        // TODO creer le repertoire (et le vider)
+        if (await !exists(tmpFolder)) {
+            await asyncMkDir(tmpFolder);
+        } else {
+            await deleteDirectoryContent(tmpFolder);
+        }
 
-    //     const app = new dm.App({
-    //         port: 0,
-    //         tmpFolder,
-    //     });
+        const app = new dm.App({
+            port: 0,
+            tmpFolder,
+        });
 
-    //     const server = await app.start();
-    //     try {
-    //         const port = server.address().port;
+        const server = await app.start();
+        try {
+            const port = server.address().port;
 
-    //         const testUrl = `http://localhost:${port}/download/nexistepas`;
-    //         const requestResponse = await new Promise<void>((resolve, reject) => {
-    //             let r = request.get(testUrl,
-    //                 {
-    //                 });
-    //             r.on('error', (error: any) => {
-    //                 reject(error);
-    //             });
-    //             r.on('response', function (response) {
-    //                 if (response.statusCode >= 400) {
-    //                     reject(response.statusCode);
-    //                 } else {
-    //                     resolve();
-    //                 }
-    //             });
-    //         });
-    //     } catch (e) {
-    //         assert(e < 500);
-    //     } finally {
-    //         await app.stop();
-    //     }
-    // });
-    // it('simple download', async function () {
-    //     const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
+            const testUrl = `http://localhost:${port}/download/nexistepas`;
+            const requestResponse = await new Promise<void>((resolve, reject) => {
+                let r = request.get(testUrl,
+                    {
+                    });
+                r.on('error', (error: any) => {
+                    reject(error);
+                });
+                r.on('response', function (response) {
+                    if (response.statusCode >= 400) {
+                        reject(response.statusCode);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+        } catch (e) {
+            assert(e < 500);
+        } finally {
+            await app.stop();
+        }
+    });
+    it('simple download', async function () {
+        const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
 
-    //     // TODO creer le repertoire (et le vider)
-    //     if (await !exists(tmpFolder)) {
-    //         await asyncMkDir(tmpFolder);
-    //     } else {
-    //         await deleteDirectoryContent(tmpFolder);
-    //     }
-    //     const filename = 'test1';
-    //     fs.writeFileSync(path.join(tmpFolder, filename), 'test');
-    //     const app = new dm.App({
-    //         port: 0,
-    //         tmpFolder,
-    //     });
-    //     const server = await app.start();
-    //     try {
-    //         const port = server.address().port;
+        // TODO creer le repertoire (et le vider)
+        if (await !exists(tmpFolder)) {
+            await asyncMkDir(tmpFolder);
+        } else {
+            await deleteDirectoryContent(tmpFolder);
+        }
+        const filename = 'test1';
+        fs.writeFileSync(path.join(tmpFolder, filename), 'test');
+        const app = new dm.App({
+            port: 0,
+            tmpFolder,
+        });
+        const server = await app.start();
+        try {
+            const port = server.address().port;
 
-    //         const testUrl = `http://localhost:${port}/download/${filename}`;
-    //         const outputFileName = path.join(tmpFolder, 'outputtest');
-    //         const requestResponse = await new Promise<void>((resolve, reject) => {
-    //             let r = request.get(testUrl,
-    //                 {
-    //                 });
-    //             r.on('error', (error: any) => {
-    //                 reject(error);
-    //             });
-    //             let output = fs.createWriteStream(outputFileName);
-    //             r.pipe(output);
-    //             output.on('finish', () => resolve());
-    //         });
-    //         assert(fs.existsSync(outputFileName));
+            const testUrl = `http://localhost:${port}/download/${filename}`;
+            const outputFileName = path.join(tmpFolder, 'outputtest');
+            const requestResponse = await new Promise<void>((resolve, reject) => {
+                let r = request.get(testUrl,
+                    {
+                    });
+                r.on('error', (error: any) => {
+                    reject(error);
+                });
+                let output = fs.createWriteStream(outputFileName);
+                r.pipe(output);
+                output.on('finish', () => resolve());
+            });
+            assert(fs.existsSync(outputFileName));
 
-    //     } finally {
-    //         await app.stop();
-    //     }
-    // });
+        } finally {
+            await app.stop();
+        }
+    });
 
     it('should send the url to client', async function () {
         const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');

@@ -12,4 +12,6 @@ var docGenerator_1 = require("./plugins/docGenerator");
 exports.DocGenerator = docGenerator_1.DocGenerator;
 var app_1 = require("./app");
 exports.App = app_1.App;
+var client_1 = require("./client/client");
+exports.Client = client_1.Client;
 //# sourceMappingURL=index.js.map

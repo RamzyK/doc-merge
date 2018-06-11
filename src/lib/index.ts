@@ -9,3 +9,4 @@ export { IPlugin }
 export { DocGenerator }
     from './plugins/docGenerator';
 export { App } from './app';
+export { Client } from './client/client';

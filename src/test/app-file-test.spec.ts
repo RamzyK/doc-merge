@@ -32,16 +32,16 @@ async function deleteDirectoryContent(dirPath: string) {
 }
 
 async function test() {
-    // let response: number;
-    // const appOptions: IAppOptions = {
-    //     port: 8555,
-    //     tmpFolder: '',
-    // };
-    // const app = new App(appOptions);
-    // app.generator.registerPlugin('docx', new dm.DocGenerator());
-    // await app.start();
-    // // tslint:disable-next-line:no-console
-    // console.log('Listening on port ' + app.server.address().port);
+    let response: number;
+    const appOptions: IAppOptions = {
+        port: 8555,
+        tmpFolder: '',
+    };
+    const app = new App(appOptions);
+    app.generator.registerPlugin('docx', new dm.DocGenerator());
+    await app.start();
+    // tslint:disable-next-line:no-console
+    console.log('Listening on port ' + app.server.address().port);
 }
 
 describe('Save file on disk', function () {
@@ -54,7 +54,7 @@ describe('Save file on disk', function () {
         }
     });
     it('Generate a file on the desktop', async function () {
-        test();
+        // test();
         let successDownload: number = 200;
     });
 });

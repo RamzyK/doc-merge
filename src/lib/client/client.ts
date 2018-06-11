@@ -1,33 +1,21 @@
-import { InputFileRef, IBody, OutputType } from './index';
+import { InputFileRef, IBody, OutputType } from '../index';
 import * as request from 'request';
-import { ExtError } from './errors/ext-error';
+import { ExtError } from '../errors/ext-error';
 
 // tslint:disable:no-console
 export class Client {
-
+    private urlService: string;
     constructor(urlService: string) {
-        //
+        this.urlService = urlService;
     }
-    public async getUrl(type: string, data: any, model: InputFileRef): Promise<string> {
-        let enumType: OutputType;
-        switch (type) {
-            case 'download':
-                enumType = OutputType.download;
-                break;
-            case 'url':
-                enumType = OutputType.url;
-                break;
-            case 'upload':
-                enumType = OutputType.upload;
-                break;
-        }
+    public async getUrl(type: string, data: any, model: InputFileRef): Promise<any> {
         const body: IBody = {
             data,
             modeleRef: model,
-            type: 'docx',
-            outputType: enumType,
+            type,
+            outputType: OutputType.url,
         };
-        const testUrl = '';
+        const testUrl = this.urlService;
         const responseUrl: any = await new Promise<void>((resolve, reject) => {
             let r = request.post(testUrl,
                 {
@@ -49,6 +37,7 @@ export class Client {
                 reject(error);
             });
         });
-        return testUrl;
+
+        return responseUrl;
     }
 }
