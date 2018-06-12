@@ -1,6 +1,6 @@
-import { InputFileRef, IBody, OutputType } from '../index';
+import { InputFileRef, IBody, OutputType } from '../../../../doc-merge-intf/src/lib/index';
 import * as request from 'request';
-import { ExtError } from '../errors/ext-error';
+import { ExtError } from '../../../../doc-merge-client/src/lib/errors/ext-error';
 
 // tslint:disable:no-console
 export class Client {
