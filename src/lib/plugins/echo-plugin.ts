@@ -1,6 +1,6 @@
-import { IPlugin, IPluginInput, IPluginOutput } from '../generateur/index';
 import * as _ from 'lodash';
 import * as fs from '../tools/fs';
+import { IPlugin, IPluginInput, IPluginOutput } from '../interfaces';
 
 export class EchoPlugin implements IPlugin {
     public async generate(input: IPluginInput): Promise<IPluginOutput> {

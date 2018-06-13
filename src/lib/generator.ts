@@ -1,9 +1,10 @@
-import { InputFileRef, IFile, InputFile } from './input-ref/input-file';
-import { IPluginInput, IPlugin, IPluginOutput } from './generateur/index';
+import { InputFileRef, IFile, IBody } from 'doc-merge-intf';
+import { IPluginInput, IPlugin, IPluginOutput } from './interfaces';
 import * as path from 'path';
 import * as express from 'express';
 import * as uuid from 'uuid';
 import {Url} from 'url';
+import { InputFile } from './input-ref/input-file';
 // tslint:disable:max-line-length
 // tslint:disable-next-line:no-empty-interface
 export interface IPluginResult {
@@ -17,16 +18,6 @@ export enum OutputType {
     download,
     url,
     upload,
-}
-export interface IBody {
-    type: string;
-    data: any;
-    schema?: string;
-    culture?: string;
-    modeleRef: InputFileRef;
-    outputFileName?: string;
-    outputPath?: string;
-    outputType: OutputType;
 }
 export function isIBody(body: any): body is IBody {
     // TODO test data.modelRef is IInputFile

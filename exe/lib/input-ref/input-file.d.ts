@@ -1,9 +1,4 @@
-export declare type InputFileRef = string | IFile;
-export interface IFile {
-    url: string;
-    headers?: any;
-    verb?: string;
-}
+import { IFile, InputFileRef } from 'doc-merge-intf';
 export interface IInputFile extends IFile {
 }
 export interface IOutputFile extends IFile {

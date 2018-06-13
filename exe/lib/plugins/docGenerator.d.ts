@@ -1,6 +1,6 @@
-import * as gn from '../generateur/index';
-export declare class DocGenerator implements gn.IPlugin {
+import { IPluginInput, IPlugin, IPluginOutput } from '../interfaces';
+export declare class DocGenerator implements IPlugin {
     constructor();
-    generate(input: gn.IPluginInput): Promise<gn.IPluginOutput>;
+    generate(input: IPluginInput): Promise<IPluginOutput>;
     private generateDocx(modelFileName, data, outputFileName);
 }

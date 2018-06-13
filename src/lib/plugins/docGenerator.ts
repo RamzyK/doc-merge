@@ -1,22 +1,22 @@
 import * as util from 'util';
-import * as gn from '../generateur/index';
 import * as fs from '../tools/fs';
 import * as path from 'path';
 import * as url from 'url';
 import * as uuid from 'uuid';
+import { IPluginInput, IPlugin, IPluginOutput } from '../interfaces';
 
 // tslint:disable:no-var-requires
 const docxtemplater = require('docxtemplater');
 const jsZip = require('jszip');
 const exists = util.promisify(fs.exists);
 // tslint:disable:no-console
-export class DocGenerator implements gn.IPlugin {
+export class DocGenerator implements IPlugin {
 
     constructor() {
         //
     }
-    public async  generate(input: gn.IPluginInput): Promise<gn.IPluginOutput> {
-        const output: gn.IPluginOutput = {
+    public async  generate(input: IPluginInput): Promise<IPluginOutput> {
+        const output: IPluginOutput = {
             outputFileName: input.outputFileName + '.docx',
             contentType: 'docx',
         };

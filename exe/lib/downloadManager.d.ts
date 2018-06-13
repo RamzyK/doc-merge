@@ -1,5 +1,5 @@
 import * as dl from './input-ref/input-file';
-import { IBody } from './index';
+import { IBody } from 'doc-merge-intf';
 export declare class DownloadHandler implements dl.IOutputFile, dl.IInputFile {
     readonly url: string;
     readonly headers: any;

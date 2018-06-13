@@ -1,13 +1,11 @@
-export { IFile, IInputFileOptions, InputFile, InputFileRef, IInputFile, IOutputFile }
+export {IInputFileOptions, InputFile, IInputFile, IOutputFile }
     from './input-ref/input-file';
-export { IPluginOld, Generator, IBody, IPluginResult, isIBody, OutputType }
+export { IPluginOld, Generator, IPluginResult, isIBody, OutputType }
     from './generator';
 export { FilePlugin }
     from './docx-plugin';
 export { IPlugin }
-    from './generateur/index';
-export { Client, App }
-    from '../../../doc-merge-client/src/lib/index';
+    from './interfaces';
 export { IErrorHandlerOptions, ErrorHandler }
     from '../lib/errors/error-handler-middleware';
 export { IErrorConstructorArgs, IErrorData, ExtError }

@@ -3,14 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const bodyParser = require("body-parser");
 const http = require("http");
-const generator_1 = require("./generator");
-const async_handler_1 = require("./async-handler");
-const echo_plugin_1 = require("./plugins/echo-plugin");
-const index_1 = require("./index");
 const fs = require("fs");
 const util = require("util");
 const path = require("path");
+const async_handler_1 = require("./async-handler");
 const error_handler_middleware_1 = require("./errors/error-handler-middleware");
+const generator_1 = require("./generator");
+const echo_plugin_1 = require("./plugins/echo-plugin");
+const docGenerator_1 = require("./plugins/docGenerator");
 const ext_error_1 = require("./errors/ext-error");
 let app = require('express');
 const exist = util.promisify(fs.exists);
@@ -24,7 +24,7 @@ class App {
         this.express.use(new error_handler_middleware_1.ErrorHandler().handler);
         this._generator = new generator_1.Generator(_options.tmpFolder);
         this._generator.registerPlugin('echo', new echo_plugin_1.EchoPlugin());
-        this._generator.registerPlugin('docx', new index_1.DocGenerator());
+        this._generator.registerPlugin('docx', new docGenerator_1.DocGenerator());
     }
     get server() {
         return this._server;

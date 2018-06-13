@@ -6,6 +6,7 @@ import { URL } from 'url';
 import * as request from 'request';
 // import * as tmp from 'tmp';
 import * as uuid from 'uuid';
+import { IFile, InputFileRef } from 'doc-merge-intf';
 
 const write = util.promisify(fs.writeFile);
 const close = util.promisify(fs.close);
@@ -14,13 +15,6 @@ const exist = util.promisify(fs.exists);
 const appendFile = util.promisify(fs.appendFile);
 const asyncExists = util.promisify(fs.exists);
 
-export type InputFileRef = string | IFile;
-
-export interface IFile {
-    url: string;
-    headers?: any;
-    verb?: string;
-}
 // tslint:disable-next-line:no-empty-interface
 export interface IInputFile extends IFile {
 
@@ -120,22 +114,4 @@ export class InputFile {
         await appendFile(fullPath, content);
         return fullPath;
     }
-
-    // const x = new Promise<[string, number]>((resolve, reject) => {
-    //     tmp.file({
-    //         mode: 0x644,
-    //         prefix,
-    //         postfix,
-    //     }, (err, p, f) => {
-    //         if (err) {
-    //             reject(err);
-    //             return;
-    //         }
-    //         return [p, f];
-    //     });
-    // });
-    // const [path, fd] = await x;
-    // await write(fd, content);
-    // await close(fd);
-    // return path;
 }

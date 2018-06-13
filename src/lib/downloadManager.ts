@@ -1,7 +1,7 @@
 import * as dl from './input-ref/input-file';
 import * as util from 'util';
 import * as fs from 'fs';
-import { IBody } from './index';
+import { IBody } from 'doc-merge-intf';
 import * as http from 'http';
 // tslint:disable-next-line:no-implicit-dependencies
 import * as formidable from 'formidable';

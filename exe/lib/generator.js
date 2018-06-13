@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const input_file_1 = require("./input-ref/input-file");
 const path = require("path");
 const uuid = require("uuid");
+const input_file_1 = require("./input-ref/input-file");
 var OutputType;
 (function (OutputType) {
     OutputType[OutputType["download"] = 0] = "download";

@@ -1,8 +1,7 @@
 import { IPluginOld, IPluginResult, Generator, OutputType } from './generator';
-import { IFile, InputFile, } from './input-ref/input-file';
+import { InputFile, } from './input-ref/input-file';
 // import { DownloadHandler } from './downloadManager';
 import * as util from 'util';
-import * as gn from './index';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as uuid from 'uuid';
@@ -11,21 +10,22 @@ import * as uuid from 'uuid';
 const jsZip = require('jszip');
 const docxtemplater = require('docxtemplater');
 import * as path from 'path';
+import { IFile, IBody } from 'doc-merge-intf';
 
 // tslint:disable:no-console
 
 export class FilePlugin implements IPluginOld {
     public name?: string;
     public cpt = 0;
-    public async merge(data: string | IFile, input: gn.IBody): Promise<IPluginResult> {
+    public async merge(data: string | IFile, input: IBody): Promise<IPluginResult> {
         return await this.docXmerge(data, input);
     }
     public generateRndmName(fileType: string): string {
         return 'file__' + uuid.v4() + fileType;
     }
 
-    private async docXmerge(data: string | IFile, input: gn.IBody): Promise<IPluginResult> {
-        const iplugin: gn.IPluginResult = {
+    private async docXmerge(data: string | IFile, input: IBody): Promise<IPluginResult> {
+        const iplugin: IPluginResult = {
             state: '',
         };
         let isDirectDownload = input.outputType === OutputType.download;
@@ -54,7 +54,7 @@ export class FilePlugin implements IPluginOld {
         return iplugin;
     }
 
-    private async docxGenerator(data: string | IFile, input: gn.IBody, fileURL: string): Promise<string> {
+    private async docxGenerator(data: string | IFile, input: IBody, fileURL: string): Promise<string> {
         const read = util.promisify(fs.readFile);
         const write = util.promisify(fs.writeFile);
         let answer: string;

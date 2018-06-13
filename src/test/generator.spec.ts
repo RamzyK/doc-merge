@@ -11,6 +11,8 @@ import * as fs from 'fs';
 import * as request from 'request';
 import { ExtError } from '../lib/errors/ext-error';
 import { URL } from 'url';
+import { IBody } from 'doc-merge-intf';
+import { App } from '../lib/app';
 const assert = chai.assert;
 
 const exists = promisify(fs.exists);
@@ -40,14 +42,14 @@ describe('Generator', function () {
         }
         // TODO file:// + chemin vers model.docx;
         const modelUrl = 'file:\\\\' + path.join(__dirname, '..\\..\\src\\test\\docx-generator-data', 'model.docx');
-        const app = new dm.App({
+        const app = new App({
             port: 0,
             tmpFolder,
         });
         const server = await app.start();
         try {
             const port = server.address().port;
-            const body: dm.IBody = {
+            const body: IBody = {
                 data: {},
                 modeleRef: { url: modelUrl },
                 type: 'docx',
@@ -83,7 +85,7 @@ describe('Generator', function () {
             await deleteDirectoryContent(tmpFolder);
         }
 
-        const app = new dm.App({
+        const app = new App({
             port: 0,
             tmpFolder,
         });
@@ -125,7 +127,7 @@ describe('Generator', function () {
         }
         const filename = 'test1';
         fs.writeFileSync(path.join(tmpFolder, filename), 'test');
-        const app = new dm.App({
+        const app = new App({
             port: 0,
             tmpFolder,
         });
@@ -161,14 +163,14 @@ describe('Generator', function () {
             await deleteDirectoryContent(tmpFolder);
         }
         const modelUrl = 'file:\\\\' + path.join(__dirname, '..\\..\\src\\test\\docx-generator-data', 'model.docx');
-        const app = new dm.App({
+        const app = new App({
             port: 0,
             tmpFolder,
         });
         const server = await app.start();
         try {
             const port = server.address().port;
-            const body: dm.IBody = {
+            const body: IBody = {
                 data: {},
                 modeleRef: { url: modelUrl },
                 type: 'docx',

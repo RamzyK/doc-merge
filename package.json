@@ -41,7 +41,8 @@
     "request": "^2.85.0",
     "save": "^2.3.2",
     "tmp": "^0.0.33",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "doc-merge-intf": "git+https://github.com/RamzyK/doc-merge-intf.git"
   },
   "devDependencies": {
     "@types/accepts": "^1.3.5",
