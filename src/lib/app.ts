@@ -17,12 +17,16 @@ import { ExtError } from './errors/ext-error';
 let app = require('express');
 const exist = util.promisify(fs.exists);
 
+let pathToConfig = path.join(__dirname, '../../config.js');
+const config = require(pathToConfig);
+
 export interface IAppOptions {
     port?: number;
     tmpFolder: string;
 }
 export class App {
-
+    private timeout: number;
+    private tmpFolderPath: string;
     private _server: http.Server;
     private express: express.Express;
     private readonly _generator: Generator;
@@ -36,6 +40,8 @@ export class App {
         return this._generator;
     }
     constructor(private readonly _options: IAppOptions) {
+        this.timeout = (config.timeOut * 60000);        // Millisecondes
+        this.tmpFolderPath = config.tmpFolder;
         this.express = express();
         this.express.use(bodyParser.json({ type: ['application/json', 'application/json-patch+json'] }));
         this.express.use('/merge', asyncMiddleware(this.mergeHandler.bind(this)));
@@ -50,6 +56,16 @@ export class App {
         if (this._server) {
             return this._server;
         }
+        if (this.timeout) {
+            let promiseA = new Promise<http.Server>(async (resolve, reject) => {
+                let wait = setTimeout(() => {
+                    clearTimeout(wait);
+                    resolve(promiseA);
+                }, this.timeout);
+            });
+            return promiseA;
+        }
+
         return new Promise<http.Server>(
             (resolve, reject) => {
                 this._server = http.createServer(this.express);
@@ -90,4 +106,24 @@ export class App {
         await this._generator.docMerge(body, request, response);
     }
 
+    private async emptyFolder(folderPath: string): Promise<void> {
+        let date = new Date();
+        let now: number;
+        if (await exist(folderPath)) {
+            now = date.getTime();
+            const fso = new ActiveXObject('Scripting.FileSystemObject');
+            let array = new Array();
+            let folder = fso.GetFolder(folderPath);
+            let file = new Enumerator(folder.files);
+            for (; !file.atEnd(); folder.moveNext()) {
+                array[array.length] = file.item();
+                if (file.item()) {
+                    // TODO: Check les fichiers avec une date de création > à timeOut
+                    // TODO: sup le fichier
+}
+            }
+        } else {
+            throw new Error(`The path ${folderPath} does not exist`);
+        }
+    }
 }

@@ -14,9 +14,12 @@ const docGenerator_1 = require("./plugins/docGenerator");
 const ext_error_1 = require("./errors/ext-error");
 let app = require('express');
 const exist = util.promisify(fs.exists);
+let pathToConfig = path.join(__dirname, '../../config.js');
+const config = require(pathToConfig);
 class App {
     constructor(_options) {
         this._options = _options;
+        this.timeout = (config.timeOut * 60000);
         this.express = express();
         this.express.use(bodyParser.json({ type: ['application/json', 'application/json-patch+json'] }));
         this.express.use('/merge', async_handler_1.asyncMiddleware(this.mergeHandler.bind(this)));
@@ -38,6 +41,15 @@ class App {
     async start() {
         if (this._server) {
             return this._server;
+        }
+        if (this.timeout) {
+            let promiseA = new Promise(async (resolve, reject) => {
+                let wait = setTimeout(() => {
+                    clearTimeout(wait);
+                    resolve(promiseA);
+                }, this.timeout);
+            });
+            return promiseA;
         }
         return new Promise((resolve, reject) => {
             this._server = http.createServer(this.express);
