@@ -10,6 +10,7 @@ export interface IAppOptions {
 export declare class App {
     private readonly _options;
     private timeout;
+    private tmpFolderPath;
     private _server;
     private express;
     private readonly _generator;

@@ -9,6 +9,7 @@ import * as fs from 'fs';
 import { promisify } from 'util';
 import { IBody } from 'doc-merge-intf';
 import { App } from '../lib/app';
+import { DirectoryCleaner } from '../lib/directory-cleaner';
 
 const assert = chai.assert;
 
@@ -26,16 +27,23 @@ async function deleteDirectoryContent(dirPath: string) {
         console.log(err);
     }
 }
+describe('empty folder', function () {
+    it('shold delete files', async function () {
+        const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
+        const cleaner = new DirectoryCleaner({
+            path: tmpFolder,
+            delay: 0,
+            interval: 30 * 60 * 1000,
+        });
+        cleaner.start();
+        cleaner.stop();
+    });
+});
 
 describe('Config server test', function () {
-    it('Should remove old files from the', async function () {
+    it('Should remove old files from the server', async function () {
+        const aDate = new Date();
         const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
-        // TODO creer le repertoire (et le vider)
-        if (! await exists(tmpFolder)) {
-            await asyncMkDir(tmpFolder);
-        } else {
-            await deleteDirectoryContent(tmpFolder);
-        }
         // TODO file:// + chemin vers model.docx;
         const modelUrl = 'file:\\\\' + path.join(__dirname, '..\\..\\src\\test\\docx-generator-data', 'model.docx');
         const app = new App({

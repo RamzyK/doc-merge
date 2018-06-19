@@ -14,12 +14,16 @@ const docGenerator_1 = require("./plugins/docGenerator");
 const ext_error_1 = require("./errors/ext-error");
 let app = require('express');
 const exist = util.promisify(fs.exists);
+const stat = util.promisify(fs.stat);
+const readDir = util.promisify(fs.readdir);
+const unlink = util.promisify(fs.unlink);
 let pathToConfig = path.join(__dirname, '../../config.js');
 const config = require(pathToConfig);
 class App {
     constructor(_options) {
         this._options = _options;
         this.timeout = (config.timeOut * 60000);
+        this.tmpFolderPath = config.tmpFolder;
         this.express = express();
         this.express.use(bodyParser.json({ type: ['application/json', 'application/json-patch+json'] }));
         this.express.use('/merge', async_handler_1.asyncMiddleware(this.mergeHandler.bind(this)));

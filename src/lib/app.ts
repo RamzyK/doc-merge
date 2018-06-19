@@ -1,6 +1,6 @@
 // tslint:disable:max-line-length
 // tslint:disable:no-var-requires
-
+// tslint:disable:no-console
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as http from 'http';
@@ -16,6 +16,9 @@ import { ExtError } from './errors/ext-error';
 
 let app = require('express');
 const exist = util.promisify(fs.exists);
+const stat = util.promisify(fs.stat);
+const readDir = util.promisify(fs.readdir);
+const unlink = util.promisify(fs.unlink);
 
 let pathToConfig = path.join(__dirname, '../../config.js');
 const config = require(pathToConfig);
@@ -25,6 +28,7 @@ export interface IAppOptions {
     tmpFolder: string;
 }
 export class App {
+
     private timeout: number;
     private tmpFolderPath: string;
     private _server: http.Server;
@@ -104,26 +108,5 @@ export class App {
             throw new Error('Bad request');
         }
         await this._generator.docMerge(body, request, response);
-    }
-
-    private async emptyFolder(folderPath: string): Promise<void> {
-        let date = new Date();
-        let now: number;
-        if (await exist(folderPath)) {
-            now = date.getTime();
-            const fso = new ActiveXObject('Scripting.FileSystemObject');
-            let array = new Array();
-            let folder = fso.GetFolder(folderPath);
-            let file = new Enumerator(folder.files);
-            for (; !file.atEnd(); folder.moveNext()) {
-                array[array.length] = file.item();
-                if (file.item()) {
-                    // TODO: Check les fichiers avec une date de création > à timeOut
-                    // TODO: sup le fichier
-}
-            }
-        } else {
-            throw new Error(`The path ${folderPath} does not exist`);
-        }
     }
 }
