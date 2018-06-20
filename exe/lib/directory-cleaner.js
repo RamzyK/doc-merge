@@ -19,9 +19,10 @@ class DirectoryCleaner {
             for (const fileName of dir) {
                 let fileStat = await stat(fileName);
                 const mTime = fileStat.mtime;
-                if (atDate.getTime() > mTime.getTime()) {
+                if (atDate.getTime() > mTime.getTime() + 60000) {
                     await unlink(fileName);
                 }
+                atDate = new Date();
             }
         }
         else {

@@ -6,6 +6,8 @@ const exist = util.promisify(fs.exists);
 const stat = util.promisify(fs.stat);
 const readDir = util.promisify(fs.readdir);
 const unlink = util.promisify(fs.unlink);
+
+// tslint:disable:no-console
 export interface IDirectoryCleanerOptions {
     path: string;
     interval: number;
@@ -20,12 +22,12 @@ export class DirectoryCleaner {
             const dir = (await readDir(folderPath))
                 .map((s) => path.join(folderPath, s));
             for (const fileName of dir) {
-                // array[array.length] = file.item();
                 let fileStat = await stat(fileName);
                 const mTime = fileStat.mtime;
-                if (atDate.getTime() > mTime.getTime()) {
+                if (atDate.getTime() > mTime.getTime() + 60000) {
                     await unlink(fileName);
                 }
+                atDate = new Date();
             }
         } else {
             throw new Error(`The path ${folderPath} does not exist`);

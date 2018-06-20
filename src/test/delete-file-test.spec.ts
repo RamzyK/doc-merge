@@ -28,12 +28,12 @@ async function deleteDirectoryContent(dirPath: string) {
     }
 }
 describe('empty folder', function () {
-    it('shold delete files', async function () {
+    it('should delete files', async function () {
         const tmpFolder = path.join(__dirname, '../../src/test/', 'tmp');
         const cleaner = new DirectoryCleaner({
             path: tmpFolder,
-            delay: 0,
-            interval: 30 * 60 * 1000,
+            delay: 60000,
+            interval: 5 * 60 * 1000,
         });
         cleaner.start();
         cleaner.stop();
